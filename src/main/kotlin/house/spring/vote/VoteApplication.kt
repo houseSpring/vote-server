@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class VoteApplication
 
 fun main(args: Array<String>) {
-	runApplication<VoteApplication>(*args)
+    runApplication<VoteApplication>(*args)
 }

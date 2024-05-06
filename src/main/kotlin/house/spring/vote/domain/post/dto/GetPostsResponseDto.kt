@@ -1,7 +1,7 @@
 package house.spring.vote.domain.post.dto
 
-import house.spring.vote.domain.post.entity.SortBy
-import java.util.Date
+import house.spring.vote.domain.post.model.SortBy
+import java.util.*
 import javax.swing.SortOrder
 
 data class GetPostsResponseDto(

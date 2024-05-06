@@ -1,7 +1,7 @@
 package house.spring.vote.controller
 
 import house.spring.vote.domain.post.dto.*
-import house.spring.vote.domain.post.entity.SortBy
+import house.spring.vote.domain.post.model.SortBy
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

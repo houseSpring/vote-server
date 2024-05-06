@@ -5,7 +5,7 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
 
-@Entity(name = "user")
+@Entity(name = "appUser")
 class UserEntity {
     constructor(nickname: String, deviceId: String?) {
         this.nickname = nickname
@@ -14,7 +14,7 @@ class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null
+    val id: Long? = null
 
     @Column(nullable = false)
     var nickname: String
@@ -24,7 +24,7 @@ class UserEntity {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now()
+    val createdAt: LocalDateTime = LocalDateTime.now()
 
     @LastModifiedDate
     @Column(nullable = false)
