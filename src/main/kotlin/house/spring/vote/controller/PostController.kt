@@ -1,6 +1,11 @@
 package house.spring.vote.controller
 
-import house.spring.vote.domain.post.dto.*
+import house.spring.vote.domain.post.dtos.request.CreatePostRequestDto
+import house.spring.vote.domain.post.dtos.request.GetPostsRequestQuery
+import house.spring.vote.domain.post.dtos.request.GetPrevPostRequestQuery
+import house.spring.vote.domain.post.dtos.response.CreatePickResponseDto
+import house.spring.vote.domain.post.dtos.response.GetPostsResponseDto
+import house.spring.vote.domain.post.dtos.response.GetPrevPostResponseDto
 import house.spring.vote.domain.post.model.SortBy
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -39,7 +44,7 @@ class PostController {
     }
 
     @PostMapping("/posts")
-    fun createPost(@RequestBody post: GetPostsResponseDto): String {
+    fun createPost(@RequestBody post: CreatePostRequestDto): String {
         return "postId"
     }
 

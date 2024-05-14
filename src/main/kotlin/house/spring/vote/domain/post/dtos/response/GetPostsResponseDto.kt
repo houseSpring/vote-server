@@ -1,4 +1,4 @@
-package house.spring.vote.domain.post.dto
+package house.spring.vote.domain.post.dtos.response
 
 import house.spring.vote.domain.post.model.SortBy
 import java.util.*

@@ -1,7 +1,7 @@
 package house.spring.vote.controller
 
-import house.spring.vote.domain.user.dto.GetUserInfoResponseDto
-import house.spring.vote.domain.user.dto.RegisterUserRequestDto
+import house.spring.vote.domain.user.dto.response.GetUserInfoResponseDto
+import house.spring.vote.domain.user.dto.request.RegisterUserRequestDto
 import house.spring.vote.domain.user.service.UserReadService
 import house.spring.vote.domain.user.service.UserWriteService
 import org.springframework.web.bind.annotation.GetMapping
