@@ -9,9 +9,7 @@ data class GetPostsResponseDto(
     val cursor: String,
     val sortBy: SortBy,
     val sortOrder: SortOrder,
-) {
-
-}
+)
 
 data class PostDto(
     val id: String,

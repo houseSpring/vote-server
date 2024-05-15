@@ -9,6 +9,4 @@ data class GetPostsRequestQuery(
     val limit: Int,
     val sortBy: SortBy,
     val sortOrder: SortOrder
-) {
-
-}
+)
