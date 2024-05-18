@@ -4,10 +4,12 @@ import house.spring.vote.domain.post.model.PickType
 
 data class CreatePostCommand(
     val title: String,
+    val userId: Long,
     val pickType: PickType,
-    val polls: List<Poll>
+    val polls: List<CreatePostCommandPoll>,
+    val imageKey: String?,
 )
 
-data class Poll(
+data class CreatePostCommandPoll(
     val title: String
 )

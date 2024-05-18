@@ -1,14 +1,17 @@
 package house.spring.vote.controller
 
-import house.spring.vote.domain.post.dtos.command.GenerateUploadImageUrlCommand
+import house.spring.vote.domain.post.dtos.command.GenerateImageUploadUrlCommand
 import house.spring.vote.domain.post.dtos.request.CreatePostRequestDto
 import house.spring.vote.domain.post.dtos.request.GetPostsRequestQuery
 import house.spring.vote.domain.post.dtos.request.GetPrevPostRequestQuery
 import house.spring.vote.domain.post.dtos.response.CreatePickResponseDto
+import house.spring.vote.domain.post.dtos.response.GenerateImageUploadUrlResponseDto
 import house.spring.vote.domain.post.dtos.response.GetPostsResponseDto
 import house.spring.vote.domain.post.dtos.response.GetPrevPostResponseDto
 import house.spring.vote.domain.post.model.SortBy
 import house.spring.vote.domain.post.service.PostWriteService
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -19,8 +22,21 @@ import javax.swing.SortOrder
 class PostController(private val postWriteService: PostWriteService) {
 
     @PostMapping("/upload-url")
-    suspend fun generateImageUploadUrl(): String {
-        return this.postWriteService.createImageUploadUrl(GenerateUploadImageUrlCommand(1))
+    suspend fun generateImageUploadUrl(): GenerateImageUploadUrlResponseDto {
+        return this.postWriteService.createImageUploadUrl(GenerateImageUploadUrlCommand(1))
+    }
+
+    @PostMapping("/posts")
+    suspend fun createPost(@RequestBody body: CreatePostRequestDto): ResponseEntity<String> {
+        val result = this.postWriteService.create(body.toCommand(1))
+        return ResponseEntity.status(HttpStatus.CREATED).body(result)
+    }
+
+    @PostMapping("/posts/:id/pick")
+    fun pickPost(id: String): CreatePickResponseDto {
+        return CreatePickResponseDto(
+            listOf(Long.MAX_VALUE)
+        )
     }
 
 
@@ -49,18 +65,6 @@ class PostController(private val postWriteService: PostWriteService) {
         return GetPrevPostResponseDto(
             id,
             "unReadPostId"
-        )
-    }
-
-    @PostMapping("/posts")
-    fun createPost(@RequestBody post: CreatePostRequestDto): String {
-        return "postId"
-    }
-
-    @PostMapping("/posts/:id/pick")
-    fun pickPost(id: String): CreatePickResponseDto {
-        return CreatePickResponseDto(
-            listOf(Long.MAX_VALUE)
         )
     }
 }

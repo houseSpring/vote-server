@@ -29,8 +29,10 @@ class S3ImageUtil(
         }
     }
 
+    private val PRESIGNED_URL_EXPIRATION = 10.minutes
+
     fun generateDownloadUrl(objectKey: String): String {
-        return "https://${this.bucket}.s3.${this.region}.amazonaws.com/$objectKey"
+        return "https://${bucket}.s3.${region}.amazonaws.com/$objectKey"
     }
 
     suspend fun generateUploadUrl(objectKey: String): String {
@@ -38,7 +40,7 @@ class S3ImageUtil(
             bucket = this@S3ImageUtil.bucket
             key = objectKey
         }
-        val presignedRequest = this.s3Client.presignPutObject(putObjectRequest, 2.minutes)
+        val presignedRequest = s3Client.presignPutObject(putObjectRequest, PRESIGNED_URL_EXPIRATION)
         return presignedRequest.url.toString()
     }
 
@@ -47,22 +49,17 @@ class S3ImageUtil(
             bucket = this@S3ImageUtil.bucket
             key = objectKey
         }
-        val presignedRequest = this.s3Client.presignGetObject(getObjectRequest, 2.minutes)
+        val presignedRequest = s3Client.presignGetObject(getObjectRequest, PRESIGNED_URL_EXPIRATION)
         return presignedRequest.url.toString()
     }
 
-    suspend fun moveObject(sourceKey: String, destinationKey: String) {
-        this.copyObject(sourceKey, destinationKey)
-        this.deleteObject(sourceKey, destinationKey)
-    }
-
-    private suspend fun copyObject(sourceKey: String, destinationKey: String): CopyObjectResponse {
+    suspend fun copyObject(sourceKey: String, destinationKey: String): CopyObjectResponse {
         val copObjectRequest = CopyObjectRequest {
             copySource = "${this@S3ImageUtil.bucket}/$sourceKey"
             bucket = this@S3ImageUtil.bucket
             key = destinationKey
         }
-        return this.s3Client.copyObject(copObjectRequest)
+        return s3Client.copyObject(copObjectRequest)
     }
 
     private suspend fun deleteObject(sourceKey: String, destinationKey: String): DeleteObjectResponse {
@@ -70,6 +67,6 @@ class S3ImageUtil(
             bucket = this@S3ImageUtil.bucket
             key = sourceKey
         }
-        return this.s3Client.deleteObject(deleteObjectRequest)
+        return s3Client.deleteObject(deleteObjectRequest)
     }
 }
