@@ -3,7 +3,7 @@ package house.spring.vote.domain.post.entity
 import jakarta.persistence.*
 
 @Entity(name = "SelectedPoll")
-class SelectedPollEntity(
+class PickedPollEntity(
         @Column(nullable = false)
         val postId: Long,
         @Column(nullable = false)

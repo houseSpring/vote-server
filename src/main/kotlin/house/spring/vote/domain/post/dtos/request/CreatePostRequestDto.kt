@@ -7,24 +7,23 @@ import house.spring.vote.domain.post.model.PickType
 data class CreatePostRequestDto(
     val title: String,
     val pickType: PickType,
-    val polls: List<PollDto>,
+    val polls: List<CreatePostRequestDtoPoll>,
     val imageKey: String? = null
-) {
-    fun toCommand(userId:Long): CreatePostCommand {
-        return CreatePostCommand(
-            title = this.title,
-            pickType = this.pickType,
-            polls = this.polls.map { it.toCommand() },
-            imageKey = this.imageKey,
-            userId = userId
-        )
-    }
-}
+)
 
-data class PollDto(
+data class CreatePostRequestDtoPoll(
     val title: String,
-) {
-    fun toCommand(): CreatePostCommandPoll = CreatePostCommandPoll(
-        title = this.title
+)
+
+
+fun CreatePostRequestDto.toCommand(userId: Long): CreatePostCommand {
+    return CreatePostCommand(
+        title = title,
+        userId = userId,
+        pickType = pickType,
+        polls = polls.map { CreatePostCommandPoll(it.title) },
+        imageKey = imageKey
     )
 }
+
+fun CreatePostRequestDtoPoll.toCommand(): CreatePostCommandPoll = CreatePostCommandPoll(title)

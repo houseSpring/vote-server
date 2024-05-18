@@ -5,13 +5,13 @@ import java.util.*
 import javax.swing.SortOrder
 
 data class GetPostsResponseDto(
-    val posts: List<PostDto>,
+    val posts: List<GetPostsResponseDtoPost>,
     val cursor: String,
     val sortBy: SortBy,
     val sortOrder: SortOrder,
 )
 
-data class PostDto(
+data class GetPostsResponseDtoPost(
     val id: String,
     val titleInfo: TitleInfoDto,
     val createdAt: Date,
@@ -19,7 +19,6 @@ data class PostDto(
 )
 
 data class TitleInfoDto(
-    val title: String,
     val imageUrl: String,
     val name: String,
 )

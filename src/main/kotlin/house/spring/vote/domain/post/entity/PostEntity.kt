@@ -30,5 +30,4 @@ class PostEntity(
         fetch = FetchType.LAZY
     )
     val polls: MutableList<PollEntity> = mutableListOf()
-
 }
