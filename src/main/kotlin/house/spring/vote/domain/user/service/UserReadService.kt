@@ -5,5 +5,5 @@ import house.spring.vote.domain.user.dto.response.GetUserInfoResponseDto
 
 
 interface UserReadService {
-    fun getUserInfo(command: GetUserInfoQuery): GetUserInfoResponseDto
+    fun getUserInfo(query: GetUserInfoQuery): GetUserInfoResponseDto
 }

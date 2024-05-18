@@ -1,5 +1,6 @@
 package house.spring.vote.controller
 
+import house.spring.vote.domain.post.dtos.command.GenerateUploadImageUrlCommand
 import house.spring.vote.domain.post.dtos.request.CreatePostRequestDto
 import house.spring.vote.domain.post.dtos.request.GetPostsRequestQuery
 import house.spring.vote.domain.post.dtos.request.GetPrevPostRequestQuery
@@ -7,6 +8,7 @@ import house.spring.vote.domain.post.dtos.response.CreatePickResponseDto
 import house.spring.vote.domain.post.dtos.response.GetPostsResponseDto
 import house.spring.vote.domain.post.dtos.response.GetPrevPostResponseDto
 import house.spring.vote.domain.post.model.SortBy
+import house.spring.vote.domain.post.service.PostWriteService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -14,7 +16,14 @@ import org.springframework.web.bind.annotation.RestController
 import javax.swing.SortOrder
 
 @RestController
-class PostController {
+class PostController(private val postWriteService: PostWriteService) {
+
+    @PostMapping("/upload-url")
+    suspend fun generateImageUploadUrl(): String {
+        return this.postWriteService.createImageUploadUrl(GenerateUploadImageUrlCommand(1))
+    }
+
+
     @GetMapping("/posts")
     fun getPosts(@RequestBody query: GetPostsRequestQuery): GetPostsResponseDto {
         return GetPostsResponseDto(
