@@ -8,6 +8,7 @@ import house.spring.vote.domain.post.dtos.response.GenerateImageUploadUrlRespons
 import house.spring.vote.domain.post.entity.PollEntity
 import house.spring.vote.domain.post.entity.PostEntity
 import house.spring.vote.domain.post.entity.PickedPollEntity
+import house.spring.vote.domain.post.event.EventPublisher
 import house.spring.vote.domain.post.model.PickType
 import house.spring.vote.domain.post.repository.PickedPollRepository
 import house.spring.vote.domain.post.repository.PostRepository
@@ -25,6 +26,7 @@ class PostWriteServiceImpl(
     private val imageKeyGenerator: ImageKeyGenerator,
     private val postRepository: PostRepository,
     private val pickedPollRepository: PickedPollRepository,
+    private val eventPublisher: EventPublisher
 ) : PostWriteService {
     override suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): GenerateImageUploadUrlResponseDto {
         // TODO: temp 저장소 근본 문제 해결 고민필요
@@ -59,8 +61,8 @@ class PostWriteServiceImpl(
     /*
     TODO
     - 예외처리 정형화
-    - 투표 이후 집계
     */
+    @Transactional
     override fun pickPost(command: PickPostCommand): CreatePickResponseDto {
         val postEntity = postRepository.findByUuid(UUID.fromString(command.postUUID))
             ?: throw RuntimeException("투표할 게시물을 찾을 수 없습니다.")
@@ -74,6 +76,7 @@ class PostWriteServiceImpl(
             )
         }
         pickedPollRepository.saveAll(pickedPollsEntities)
+        eventPublisher.publishPickedPoll(postEntity.id!!, command.pickedPollIds)
 
         return CreatePickResponseDto(
             command.postUUID,
@@ -104,6 +107,7 @@ class PostWriteServiceImpl(
                     throw RuntimeException("다중 선택 게시물에서는 한개 이상의 항목을 선택해야 합니다.")
                 }
             }
+
         }
     }
 
