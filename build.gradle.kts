@@ -30,12 +30,18 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    // aws s3
     implementation("aws.sdk.kotlin:s3:1.2.12"){
         exclude("com.squareup.okhttp3", "okhttp")
     }
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
+    // coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3")
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis:3.2.5")
+    // Kafka
+    implementation("org.springframework.kafka:spring-kafka:3.0.10")
 
 
     runtimeOnly("com.h2database:h2")
@@ -43,6 +49,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
 }
 
 tasks.withType<KotlinCompile> {

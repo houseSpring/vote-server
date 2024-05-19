@@ -87,10 +87,23 @@ class PostWriteServiceImpl(
                 ?: throw RuntimeException("투표할 항목을 찾을 수 없습니다.")
         }
 
-        if (postEntity.pickType == PickType.Single && command.pickedPollIds.size > 1) {
-            throw RuntimeException("단일 선택 게시물에서는 한개의 항목만 선택할 수 있습니다.")
-        } else if (postEntity.pickType == PickType.Multi && command.pickedPollIds.isEmpty()) {
-            throw RuntimeException("다중 선택 게시물에서는 한개 이상의 항목을 선택해야 합니다.")
+        pickedPollRepository.findAllByPostIdAndUserId(postEntity.id!!, command.userId)
+            .takeIf { it.isNotEmpty() }
+            ?.let {
+                throw RuntimeException("이미 투표한 게시물입니다.")
+            }
+
+        when (postEntity.pickType) {
+            PickType.Single -> {
+                if (command.pickedPollIds.size != 1) {
+                    throw RuntimeException("단일 선택 게시물에서는 한개의 항목만 선택할 수 있습니다.")
+                }
+            }
+            PickType.Multi -> {
+                if (command.pickedPollIds.size <= 1) {
+                    throw RuntimeException("다중 선택 게시물에서는 한개 이상의 항목을 선택해야 합니다.")
+                }
+            }
         }
     }
 
