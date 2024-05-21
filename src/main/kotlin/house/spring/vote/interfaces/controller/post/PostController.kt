@@ -2,6 +2,7 @@ package house.spring.vote.interfaces.controller.post
 
 import house.spring.vote.application.post.dto.command.GenerateImageUploadUrlCommand
 import house.spring.vote.application.post.dto.command.PickPostCommand
+import house.spring.vote.application.post.dto.query.GetPostsQuery
 import house.spring.vote.application.post.service.PostReadService
 import house.spring.vote.application.post.service.PostWriteService
 import house.spring.vote.interfaces.controller.post.request.*
@@ -17,6 +18,7 @@ class PostController(
     private val postReadService: PostReadService
 ) {
 
+    // TODO: userAuthN 에서 받아오는 userId로 변경
     private val userId = 1L
 
     @PostMapping("/upload-url")
@@ -45,13 +47,14 @@ class PostController(
 
 
     @GetMapping("/posts")
-    fun getPosts(@RequestBody query: GetPostsRequestQuery): GetPostsResponseDto {
-        return GetPostsResponseDto(
-            emptyList(),
-            "cursor",
-            query.sortBy,
-            query.sortOrder
+    fun getPosts(@RequestBody dto: GetPostsRequestDto): GetPostsResponseDto {
+        val query = GetPostsQuery(
+            cursor = dto.cursor,
+            limit = dto.limit,
+            sortBy = dto.sortBy,
+            sortOrder = dto.sortOrder
         )
+        return postReadService.getPosts(query)
     }
 
     @GetMapping("/posts/{id}")
@@ -59,6 +62,7 @@ class PostController(
         return postReadService.getPost(id)
     }
 
+    // TODO: 이미 읽은 컨텐츠는 다시 보여주기로 했던가..?
     @GetMapping("/posts/{id}/prev")
     fun getNextPostInfo(
         @PathVariable id: String,

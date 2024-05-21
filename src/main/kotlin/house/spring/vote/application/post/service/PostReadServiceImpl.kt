@@ -1,5 +1,6 @@
 package house.spring.vote.application.post.service
 
+import house.spring.vote.application.post.dto.query.GetPostsQuery
 import house.spring.vote.domain.repository.PostRepository
 import house.spring.vote.interfaces.controller.post.response.*
 import house.spring.vote.util.RedisKeyGenerator
@@ -35,5 +36,9 @@ class PostReadServiceImpl(
             createdAt = postEntity.createdAt,
             updatedAt = postEntity.updatedAt
         )
+    }
+
+    override fun getPosts(query: GetPostsQuery): GetPostsResponseDto {
+        TODO("Not yet implemented")
     }
 }
