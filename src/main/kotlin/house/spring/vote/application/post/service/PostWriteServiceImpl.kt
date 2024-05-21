@@ -24,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class PostWriteServiceImpl(
@@ -53,15 +52,16 @@ class PostWriteServiceImpl(
             command.polls.map { pollFactory.create(it.title) })
         val postEntity = postMapper.toEntity(post).let { postRepository.save(it) }
 
-        if (command.imageKey != null) {
-            postEntity.imageUrl = generateAndCopyImage(postEntity.uuid.toString(), command.imageKey)
+        if (post.hasImage()) {
+            postEntity.imageUrl = generateAndCopyImage(postEntity.uuid, command.imageKey!!)
+            postRepository.save(postEntity)// TODO: dirty checking이 동작하지 않는 부분 확인 필요
         }
-        return@withContext postEntity.uuid.toString()
+        return@withContext postEntity.uuid
     }
 
     @Transactional
     override fun pickPost(command: PickPostCommand): CreatePickResponseDto {
-        val postEntity = postRepository.findByUuid(UUID.fromString(command.postUUID))
+        val postEntity = postRepository.findByUuid(command.postUUID)
             ?: throw NotFoundException("게시글을 찾을 수 없습니다. (${command.postUUID})")
 
         val post = postMapper.toDomain(postEntity)
@@ -76,7 +76,6 @@ class PostWriteServiceImpl(
 
         val event = PickedPollEvent(this, postEntity.id!!, command.pickedPollIds)
         eventPublisher.publishEvent(event)
-
         return CreatePickResponseDto(
             command.postUUID, command.pickedPollIds
         )

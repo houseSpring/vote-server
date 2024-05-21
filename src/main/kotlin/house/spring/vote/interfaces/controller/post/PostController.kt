@@ -29,10 +29,10 @@ class PostController(
     }
 
     @PostMapping("/posts")
-    suspend fun createPost(@RequestBody dto: CreatePostRequestDto): ResponseEntity<String> {
+    suspend fun createPost(@RequestBody dto: CreatePostRequestDto): ResponseEntity<CreatePostResponseDto> {
         val command = dto.toCommand(userId)
         val result = this.postWriteService.create(command)
-        return ResponseEntity.status(HttpStatus.CREATED).body(result)
+        return ResponseEntity.status(HttpStatus.CREATED).body(CreatePostResponseDto(result))
     }
 
     @PostMapping("/posts/{id}/pick")
@@ -47,22 +47,24 @@ class PostController(
 
 
     @GetMapping("/posts")
-    fun getPosts(@RequestBody dto: GetPostsRequestDto): GetPostsResponseDto {
+    fun getPosts(@RequestBody dto: GetPostsRequestDto): ResponseEntity<GetPostsResponseDto> {
         val query = GetPostsQuery(
             cursor = dto.cursor,
             limit = dto.limit,
             sortBy = dto.sortBy,
             sortOrder = dto.sortOrder
         )
-        return postReadService.getPosts(query)
+        val result = postReadService.getPosts(query)
+        return ResponseEntity.ok(result)
     }
 
     @GetMapping("/posts/{id}")
-    fun getPost(@PathVariable id: String): GetPostResponseDto {
-        return postReadService.getPost(id)
+    fun getPost(@PathVariable id: String): ResponseEntity<GetPostResponseDto> {
+        val result = postReadService.getPost(id)
+        return ResponseEntity.ok(result)
     }
 
-    // TODO: 이미 읽은 컨텐츠는 다시 보여주기로 했던가..?
+    // TODO: 이미 읽은 투표한 컨텐츠는 보여주지 않음
     @GetMapping("/posts/{id}/prev")
     fun getNextPostInfo(
         @PathVariable id: String,

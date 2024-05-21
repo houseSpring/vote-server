@@ -14,7 +14,7 @@ class PostEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(nullable = false, unique = true)
-    val uuid: UUID? = UUID.randomUUID(), // TODO: UUID.randomUUID() 해결 필요
+    val uuid: String = UUID.randomUUID().toString(), // TODO: UUID.randomUUID() 해결 필요
     @Column(nullable = false)
     val title: String,
     @Column(nullable = false)
@@ -39,4 +39,9 @@ class PostEntity(
     val updatedAt: LocalDateTime = LocalDateTime.now()
 
     val deletedAt: LocalDateTime? = null
+
+    fun addPoll(poll: PollEntity) {
+        (polls as MutableList).add(poll)
+        poll.post = this
+    }
 }

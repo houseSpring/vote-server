@@ -17,7 +17,7 @@ class PostReadServiceImpl(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : PostReadService {
     override fun getPost(postUUId: String): GetPostResponseDto {
-        val postEntity = postRepository.findByUuid(UUID.fromString(postUUId))
+        val postEntity = postRepository.findByUuid(postUUId)
             ?: throw NotFoundException("게시글을 찾을 수 없습니다. ($postUUId)")
         val pickPostKey = RedisKeyGenerator.generatePickPostKey(postEntity.id!!)
         val pickPostCount = redisTemplate.opsForValue().get(pickPostKey)?.toInt() ?: 0

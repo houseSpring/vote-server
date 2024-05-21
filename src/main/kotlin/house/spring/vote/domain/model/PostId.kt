@@ -4,5 +4,5 @@ import java.util.*
 
 data class PostId(
     val incrementId: Long,
-    val uuid: UUID
+    val uuid: String
 )

@@ -10,19 +10,20 @@ class PostMapper(
     private val pollMapper: PollMapper
 ) {
     fun toEntity(domain: Post): PostEntity {
-        return PostEntity(
-            id = domain.id?.incrementId,
-            uuid = domain.id?.uuid,
+        val entity = PostEntity(
             title = domain.title,
             userId = domain.userId,
             pickType = domain.pickType,
             imageUrl = domain.imageUrl,
-            polls = domain.polls.map { pollMapper.toEntity(it) }
         )
+        domain.polls.forEach { poll ->
+            entity.addPoll(pollMapper.toEntity(poll))
+        }
+        return entity
     }
 
     fun toDomain(entity: PostEntity): Post {
-        val postId = if (entity.id != null && entity.uuid != null) {
+        val postId = if (entity.id != null) {
             PostId(entity.id, entity.uuid)
         } else {
             null
