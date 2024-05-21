@@ -6,14 +6,13 @@ import house.spring.vote.application.post.dto.command.PickPostCommand
 import house.spring.vote.domain.event.PickedPollEvent
 import house.spring.vote.domain.factory.PollFactory
 import house.spring.vote.domain.factory.PostFactory
-import house.spring.vote.domain.model.PickType
 import house.spring.vote.domain.model.Post
 import house.spring.vote.domain.repository.PickedPollRepository
 import house.spring.vote.domain.repository.PostRepository
 import house.spring.vote.domain.service.ImageUrlGenerator
 import house.spring.vote.infrastructure.entity.PickedPollEntity
 import house.spring.vote.infrastructure.mapper.PostMapper
-import house.spring.vote.infrastructure.util.S3ImageUtil
+import house.spring.vote.infrastructure.serivce.S3ImageManager
 import house.spring.vote.interfaces.controller.post.response.CreatePickResponseDto
 import house.spring.vote.interfaces.controller.post.response.GenerateImageUploadUrlResponseDto
 import jakarta.transaction.Transactional
@@ -25,7 +24,7 @@ import java.util.*
 
 @Service
 class PostWriteServiceImpl(
-    private val s3ImageUtil: S3ImageUtil,
+    private val s3ImageManager: S3ImageManager,
     private val imageUrlGenerator: ImageUrlGenerator,
     private val postRepository: PostRepository,
     private val pickedPollRepository: PickedPollRepository,
@@ -35,9 +34,8 @@ class PostWriteServiceImpl(
     private val eventPublisher: ApplicationEventPublisher,
 ) : PostWriteService {
     override suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): GenerateImageUploadUrlResponseDto {
-        // TODO: temp 저장소 근본 문제 해결 고민필요
         val imageKey = imageUrlGenerator.generateTempImageKey(command.userId.toString())
-        val presignedUrl = s3ImageUtil.generateUploadUrl(imageKey)
+        val presignedUrl = s3ImageManager.generateUploadUrl(imageKey)
         return GenerateImageUploadUrlResponseDto(presignedUrl, imageKey)
     }
 
@@ -105,7 +103,7 @@ class PostWriteServiceImpl(
     private suspend fun generateAndCopyImage(postId: String, source: String): String {
         val destinationKey = imageUrlGenerator.generateImageKey(postId)
         try {
-            s3ImageUtil.copyObject(source, destinationKey)
+            s3ImageManager.copyObject(source, destinationKey)
         } catch (e: Exception) {
             throw RuntimeException("이미지 복사 실패", e)
         }

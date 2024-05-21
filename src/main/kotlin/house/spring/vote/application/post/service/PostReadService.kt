@@ -5,5 +5,5 @@ import house.spring.vote.interfaces.controller.post.response.*
 
 interface PostReadService {
     fun getPosts(query: GetPostsQuery): GetPostsResponseDto
-    fun getPost(postId: String): GetPostResponseDto
+    fun getPost(postUUId: String): GetPostResponseDto
 }

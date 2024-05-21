@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.util
+package house.spring.vote.infrastructure.serivce
 
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 import kotlin.time.Duration.Companion.minutes
 
 @Component
-class S3ImageUtil(
+class S3ImageManager(
     @Value("\${aws.s3.bucket}")
     private val bucket: String,
     @Value("\${aws.s3.region}")
@@ -22,10 +22,10 @@ class S3ImageUtil(
 ) {
 
     private val s3Client: S3Client = S3Client {
-        region = this@S3ImageUtil.region
+        region = this@S3ImageManager.region
         credentialsProvider = StaticCredentialsProvider {
-            accessKeyId = this@S3ImageUtil.accessKeyId
-            secretAccessKey = this@S3ImageUtil.secretAccessKey
+            accessKeyId = this@S3ImageManager.accessKeyId
+            secretAccessKey = this@S3ImageManager.secretAccessKey
         }
     }
 
@@ -37,7 +37,7 @@ class S3ImageUtil(
 
     suspend fun generateUploadUrl(objectKey: String): String {
         val putObjectRequest = PutObjectRequest {
-            bucket = this@S3ImageUtil.bucket
+            bucket = this@S3ImageManager.bucket
             key = objectKey
         }
         val presignedRequest = s3Client.presignPutObject(putObjectRequest, PRESIGNED_URL_EXPIRATION)
@@ -46,7 +46,7 @@ class S3ImageUtil(
 
     suspend fun generateSignedDownloadUrl(objectKey: String): String {
         val getObjectRequest = GetObjectRequest {
-            bucket = this@S3ImageUtil.bucket
+            bucket = this@S3ImageManager.bucket
             key = objectKey
         }
         val presignedRequest = s3Client.presignGetObject(getObjectRequest, PRESIGNED_URL_EXPIRATION)
@@ -55,8 +55,8 @@ class S3ImageUtil(
 
     suspend fun copyObject(sourceKey: String, destinationKey: String): CopyObjectResponse {
         val copObjectRequest = CopyObjectRequest {
-            copySource = "${this@S3ImageUtil.bucket}/$sourceKey"
-            bucket = this@S3ImageUtil.bucket
+            copySource = "${this@S3ImageManager.bucket}/$sourceKey"
+            bucket = this@S3ImageManager.bucket
             key = destinationKey
         }
         return s3Client.copyObject(copObjectRequest)
@@ -64,7 +64,7 @@ class S3ImageUtil(
 
     private suspend fun deleteObject(sourceKey: String, destinationKey: String): DeleteObjectResponse {
         val deleteObjectRequest = DeleteObjectRequest {
-            bucket = this@S3ImageUtil.bucket
+            bucket = this@S3ImageManager.bucket
             key = sourceKey
         }
         return s3Client.deleteObject(deleteObjectRequest)
