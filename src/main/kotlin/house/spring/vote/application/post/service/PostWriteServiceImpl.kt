@@ -1,5 +1,9 @@
 package house.spring.vote.application.post.service
 
+import house.spring.vote.application.error.BadRequestException
+import house.spring.vote.application.error.ConflictException
+import house.spring.vote.application.error.InternalServerException
+import house.spring.vote.application.error.NotFoundException
 import house.spring.vote.application.post.dto.command.CreatePostCommand
 import house.spring.vote.application.post.dto.command.GenerateImageUploadUrlCommand
 import house.spring.vote.application.post.dto.command.PickPostCommand
@@ -55,14 +59,11 @@ class PostWriteServiceImpl(
         return@withContext postEntity.uuid.toString()
     }
 
-    /*
-    TODO
-    - 예외처리 정형화
-    */
     @Transactional
     override fun pickPost(command: PickPostCommand): CreatePickResponseDto {
         val postEntity = postRepository.findByUuid(UUID.fromString(command.postUUID))
-            ?: throw RuntimeException("투표할 게시물을 찾을 수 없습니다.")
+            ?: throw NotFoundException("게시글을 찾을 수 없습니다. (${command.postUUID})")
+
         val post = postMapper.toDomain(postEntity)
         validatePickedPollCommand(post, command)
 
@@ -72,9 +73,10 @@ class PostWriteServiceImpl(
             )
         }
         pickedPollRepository.saveAll(pickedPollsEntities)
-        val event = PickedPollEvent(this, postEntity.id!!, command.pickedPollIds)
 
+        val event = PickedPollEvent(this, postEntity.id!!, command.pickedPollIds)
         eventPublisher.publishEvent(event)
+
         return CreatePickResponseDto(
             command.postUUID, command.pickedPollIds
         )
@@ -82,13 +84,13 @@ class PostWriteServiceImpl(
 
     private fun validatePickedPollCommand(post: Post, command: PickPostCommand) {
         if (this.hasUserAlreadyPicked(post.id!!.incrementId, command.userId)) {
-            throw RuntimeException("이미 투표한 게시물입니다.")
+            throw ConflictException("이미 투표한 게시물입니다. (${post.id.uuid})")
         }
         if (this.hasInvalidPollId(post, command.pickedPollIds)) {
-            throw RuntimeException("투표할 항목을 찾을 수 없습니다.")
+            throw NotFoundException("투표 항목을 찾을 수 없습니다. (${command.pickedPollIds.joinToString()})")
         }
         if (!post.validatePickedPollsSize(command.pickedPollIds.size)) {
-            throw RuntimeException("선택할 수 있는 항목의 갯수가 맞지 않습니다.")
+            throw BadRequestException("선택할 수 있는 항목의 갯수가 맞지 않습니다.")
         }
     }
 
@@ -105,7 +107,7 @@ class PostWriteServiceImpl(
         try {
             s3ImageManager.copyObject(source, destinationKey)
         } catch (e: Exception) {
-            throw RuntimeException("이미지 복사 실패", e)
+            throw InternalServerException("이미지 복사에 실패했습니다. ($source -> $destinationKey)")
         }
         return destinationKey
     }
