@@ -2,9 +2,13 @@ package house.spring.vote.infrastructure.entity
 
 import house.spring.vote.domain.model.PickType
 import jakarta.persistence.*
+import org.hibernate.annotations.UpdateTimestamp
+import org.springframework.data.annotation.CreatedDate
+import java.time.LocalDateTime
 import java.util.*
 
-@Entity(name = "Post")
+@Entity
+@Table(name = "post", indexes = [Index(name = "idx_post_uuid", columnList = "uuid", unique = true)])
 class PostEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +31,10 @@ class PostEntity(
     )
     val polls: List<PollEntity> = mutableListOf()
 ) {
+
+    @CreatedDate
+    val createdAt: LocalDateTime = LocalDateTime.now()
+
+    @UpdateTimestamp
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 }

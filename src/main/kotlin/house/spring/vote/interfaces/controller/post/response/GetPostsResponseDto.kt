@@ -1,7 +1,7 @@
 package house.spring.vote.interfaces.controller.post.response
 
 import house.spring.vote.domain.model.SortBy
-import java.util.*
+import java.time.LocalDateTime
 import javax.swing.SortOrder
 
 data class GetPostsResponseDto(
@@ -13,12 +13,9 @@ data class GetPostsResponseDto(
 
 data class GetPostsResponseDtoPost(
     val id: String,
-    val titleInfo: TitleInfoDto,
-    val createdAt: Date,
-    val updatedAt: Date,
-)
-
-data class TitleInfoDto(
+    val title:String,
     val imageUrl: String,
-    val name: String,
+    val participantCount: Int,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
 )

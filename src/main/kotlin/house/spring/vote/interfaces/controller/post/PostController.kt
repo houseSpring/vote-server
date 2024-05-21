@@ -2,20 +2,20 @@ package house.spring.vote.interfaces.controller.post
 
 import house.spring.vote.application.post.dto.command.GenerateImageUploadUrlCommand
 import house.spring.vote.application.post.dto.command.PickPostCommand
+import house.spring.vote.application.post.service.PostReadService
 import house.spring.vote.application.post.service.PostWriteService
-import house.spring.vote.domain.model.SortBy
 import house.spring.vote.interfaces.controller.post.request.*
-import house.spring.vote.interfaces.controller.post.response.CreatePickResponseDto
-import house.spring.vote.interfaces.controller.post.response.GenerateImageUploadUrlResponseDto
-import house.spring.vote.interfaces.controller.post.response.GetPostsResponseDto
-import house.spring.vote.interfaces.controller.post.response.GetPrevPostResponseDto
+import house.spring.vote.interfaces.controller.post.response.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.swing.SortOrder
+
 
 @RestController
-class PostController(private val postWriteService: PostWriteService) {
+class PostController(
+    private val postWriteService: PostWriteService,
+    private val postReadService: PostReadService
+) {
 
     private val userId = 1L
 
@@ -55,17 +55,15 @@ class PostController(private val postWriteService: PostWriteService) {
     }
 
     @GetMapping("/posts/{id}")
-    fun getPost(@PathVariable id: String): GetPostsResponseDto {
-        return GetPostsResponseDto(
-            emptyList(),
-            "cursor",
-            SortBy.CREATED_AT,
-            SortOrder.ASCENDING
-        )
+    fun getPost(@PathVariable id: String): GetPostResponseDto {
+        return postReadService.getPost(id)
     }
 
     @GetMapping("/posts/{id}/prev")
-    fun getNextPostInfo(@PathVariable id: String, @RequestBody query: GetPrevPostRequestQuery): GetPrevPostResponseDto {
+    fun getNextPostInfo(
+        @PathVariable id: String,
+        @RequestBody query: GetPrevPostRequestQuery
+    ): GetPrevPostResponseDto {
         return GetPrevPostResponseDto(
             id,
             "unReadPostId"
