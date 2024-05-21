@@ -8,7 +8,12 @@ data class Post(
     val imageUrl: String? = null,
     val polls: List<Poll> = mutableListOf()
 ) {
-    fun addPoll(poll: Poll) {
-        polls.addLast(poll)
+    fun hasPollId(pollId: Long): Boolean = polls.any { it.id == pollId }
+
+    fun validatePickedPollsSize(size: Int): Boolean {
+        return when (pickType) {
+            PickType.Multi -> size >= 2
+            PickType.Single -> size == 1
+        }
     }
 }

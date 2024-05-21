@@ -11,7 +11,7 @@ class PostMapper(
 ) {
     fun toEntity(domain: Post): PostEntity {
         return PostEntity(
-            id = domain.id?.id,
+            id = domain.id?.incrementId,
             uuid = domain.id?.uuid,
             title = domain.title,
             userId = domain.userId,

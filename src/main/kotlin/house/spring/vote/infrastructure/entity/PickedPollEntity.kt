@@ -4,6 +4,9 @@ import jakarta.persistence.*
 
 @Entity(name = "SelectedPoll")
 class PickedPollEntity(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
     @Column(nullable = false)
     val postId: Long,
     @Column(nullable = false)
@@ -11,9 +14,5 @@ class PickedPollEntity(
     @Column(nullable = false)
     val userId: Long
 ) {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null
 
 }

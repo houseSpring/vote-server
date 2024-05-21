@@ -7,11 +7,11 @@ import house.spring.vote.domain.event.PickedPollEvent
 import house.spring.vote.domain.factory.PollFactory
 import house.spring.vote.domain.factory.PostFactory
 import house.spring.vote.domain.model.PickType
+import house.spring.vote.domain.model.Post
 import house.spring.vote.domain.repository.PickedPollRepository
 import house.spring.vote.domain.repository.PostRepository
 import house.spring.vote.domain.service.ImageUrlGenerator
 import house.spring.vote.infrastructure.entity.PickedPollEntity
-import house.spring.vote.infrastructure.entity.PostEntity
 import house.spring.vote.infrastructure.mapper.PostMapper
 import house.spring.vote.infrastructure.util.S3ImageUtil
 import house.spring.vote.interfaces.controller.post.response.CreatePickResponseDto
@@ -65,7 +65,8 @@ class PostWriteServiceImpl(
     override fun pickPost(command: PickPostCommand): CreatePickResponseDto {
         val postEntity = postRepository.findByUuid(UUID.fromString(command.postUUID))
             ?: throw RuntimeException("투표할 게시물을 찾을 수 없습니다.")
-        validatePickAble(command, postEntity)
+        val post = postMapper.toDomain(postEntity)
+        validatePickedPollCommand(post, command)
 
         val pickedPollsEntities = command.pickedPollIds.map { pollId ->
             PickedPollEntity(
@@ -73,38 +74,32 @@ class PostWriteServiceImpl(
             )
         }
         pickedPollRepository.saveAll(pickedPollsEntities)
-
         val event = PickedPollEvent(this, postEntity.id!!, command.pickedPollIds)
-        eventPublisher.publishEvent(event)
 
+        eventPublisher.publishEvent(event)
         return CreatePickResponseDto(
             command.postUUID, command.pickedPollIds
         )
     }
 
-    private fun validatePickAble(command: PickPostCommand, postEntity: PostEntity): Unit {
-        command.pickedPollIds.forEach { pollId ->
-            postEntity.polls.find { it.id == pollId } ?: throw RuntimeException("투표할 항목을 찾을 수 없습니다.")
-        }
-
-        pickedPollRepository.findAllByPostIdAndUserId(postEntity.id!!, command.userId).takeIf { it.isNotEmpty() }?.let {
+    private fun validatePickedPollCommand(post: Post, command: PickPostCommand) {
+        if (this.hasUserAlreadyPicked(post.id!!.incrementId, command.userId)) {
             throw RuntimeException("이미 투표한 게시물입니다.")
         }
-
-        when (postEntity.pickType) {
-            PickType.Single -> {
-                if (command.pickedPollIds.size != 1) {
-                    throw RuntimeException("단일 선택 게시물에서는 한개의 항목만 선택할 수 있습니다.")
-                }
-            }
-
-            PickType.Multi -> {
-                if (command.pickedPollIds.size <= 1) {
-                    throw RuntimeException("다중 선택 게시물에서는 한개 이상의 항목을 선택해야 합니다.")
-                }
-            }
-
+        if (this.hasInvalidPollId(post, command.pickedPollIds)) {
+            throw RuntimeException("투표할 항목을 찾을 수 없습니다.")
         }
+        if (!post.validatePickedPollsSize(command.pickedPollIds.size)) {
+            throw RuntimeException("선택할 수 있는 항목의 갯수가 맞지 않습니다.")
+        }
+    }
+
+    private fun hasInvalidPollId(post: Post, pollIds: List<Long>): Boolean {
+        return pollIds.any { !post.hasPollId(it) }
+    }
+
+    private fun hasUserAlreadyPicked(postId: Long, userId: Long): Boolean {
+        return pickedPollRepository.findAllByPostIdAndUserId(postId, userId).isNotEmpty()
     }
 
     private suspend fun generateAndCopyImage(postId: String, source: String): String {
