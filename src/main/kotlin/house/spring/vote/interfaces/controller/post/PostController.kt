@@ -50,7 +50,6 @@ class PostController(
     fun getPosts(@RequestBody dto: GetPostsRequestDto): ResponseEntity<GetPostsResponseDto> {
         val query = GetPostsQuery(
             cursor = dto.cursor,
-            limit = dto.limit,
             sortBy = dto.sortBy,
             sortOrder = dto.sortOrder
         )
@@ -64,7 +63,7 @@ class PostController(
         return ResponseEntity.ok(result)
     }
 
-    // TODO: 이미 읽은 투표한 컨텐츠는 보여주지 않음
+    // TODO: 이미 투표한 컨텐츠는 보여주지 않음
     @GetMapping("/posts/{id}/prev")
     fun getNextPostInfo(
         @PathVariable id: String,

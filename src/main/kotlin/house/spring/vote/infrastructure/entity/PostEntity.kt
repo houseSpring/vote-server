@@ -8,7 +8,12 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(name = "post", indexes = [Index(name = "idx_post_uuid", columnList = "uuid", unique = true)])
+@Table(
+    name = "post", indexes = [
+        Index(name = "idx_post_uuid", columnList = "uuid", unique = true),
+        Index(name = "idx_post_cursor", columnList = "createdAt")
+    ]
+)
 class PostEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +43,7 @@ class PostEntity(
     @UpdateTimestamp
     val updatedAt: LocalDateTime = LocalDateTime.now()
 
+    @Column(nullable = true)
     val deletedAt: LocalDateTime? = null
 
     fun addPoll(poll: PollEntity) {

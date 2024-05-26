@@ -1,9 +1,17 @@
 package house.spring.vote.domain.repository
 
 import house.spring.vote.infrastructure.entity.PostEntity
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.*
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 
 interface PostRepository : JpaRepository<PostEntity, Long> {
     fun findByUuid(uuid: String): PostEntity?
+
+    @Query("SELECT p FROM PostEntity p WHERE p.id < :cursor AND p.deletedAt IS NULL")
+    fun findAllByIdSmallerThanCursor(@Param("cursor") cursor: Long, pageable: Pageable): ArrayList<PostEntity>
+
+    @Query("SELECT p FROM PostEntity p WHERE p.id > :cursor AND p.deletedAt IS NULL")
+    fun findAllByIdBiggerThanCursor(@Param("cursor") cursor: Long, pageable: Pageable): ArrayList<PostEntity>
 }
