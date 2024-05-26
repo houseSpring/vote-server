@@ -3,7 +3,7 @@ package house.spring.vote.domain.validation
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 
-// TODO: 의도와 달리 아예 동작하지 않음. 
+// TODO: 의도와 달리 아예 동작하지 않음.
 class EnumValidator : ConstraintValidator<ValidEnum, String> {
     private lateinit var enumValues: Array<String>
 
