@@ -43,6 +43,10 @@ dependencies {
     // Kafka
     //implementation("org.springframework.kafka:spring-kafka:3.0.10")
 
+    // aurora - mysql
+    implementation("mysql:mysql-connector-java:8.0.32")
+
+    // h2
     runtimeOnly("com.h2database:h2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
