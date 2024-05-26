@@ -3,6 +3,7 @@ package house.spring.vote.interfaces.controller.post
 import house.spring.vote.application.post.dto.command.GenerateImageUploadUrlCommand
 import house.spring.vote.application.post.dto.command.PickPostCommand
 import house.spring.vote.application.post.dto.query.GetPostsQuery
+import house.spring.vote.application.post.dto.query.GetPrevPostIdQuery
 import house.spring.vote.application.post.service.PostReadService
 import house.spring.vote.application.post.service.PostWriteService
 import house.spring.vote.interfaces.controller.post.request.*
@@ -14,8 +15,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 class PostController(
-    private val postWriteService: PostWriteService,
-    private val postReadService: PostReadService
+    private val postWriteService: PostWriteService, private val postReadService: PostReadService
 ) {
 
     // TODO: userAuthN 에서 받아오는 userId로 변경
@@ -37,8 +37,7 @@ class PostController(
 
     @PostMapping("/posts/{id}/pick")
     fun pickPost(
-        @PathVariable("id") postId: String,
-        @RequestBody dto: PickPostRequestDto
+        @PathVariable("id") postId: String, @RequestBody dto: PickPostRequestDto
     ): ResponseEntity<CreatePickResponseDto> {
         val command = PickPostCommand(postId, userId, dto.pickedPollIds)
         val result = this.postWriteService.pickPost(command)
@@ -47,12 +46,9 @@ class PostController(
 
 
     @GetMapping("/posts")
-    fun getPosts(@RequestBody dto: GetPostsRequestDto): ResponseEntity<GetPostsResponseDto> {
+    fun getPosts(@ModelAttribute dto: GetPostsRequestDto): ResponseEntity<GetPostsResponseDto> {
         val query = GetPostsQuery(
-            cursor = dto.cursor,
-            sortBy = dto.sortBy,
-            sortOrder = dto.sortOrder,
-            userId = userId
+            cursor = dto.cursor, sortBy = dto.sortBy, sortOrder = dto.sortOrder, userId = userId
         )
         val result = postReadService.getPosts(query)
         return ResponseEntity.ok(result)
@@ -64,15 +60,14 @@ class PostController(
         return ResponseEntity.ok(result)
     }
 
-    // TODO: 이미 투표한 컨텐츠는 보여주지 않음
     @GetMapping("/posts/{id}/prev")
     fun getNextPostInfo(
-        @PathVariable id: String,
-        @RequestBody query: GetPrevPostRequestQuery
-    ): GetPrevPostResponseDto {
-        return GetPrevPostResponseDto(
-            id,
-            "unReadPostId"
+        @PathVariable("id") postId: String, @ModelAttribute dto: GetPrevPostRequestDto
+    ): ResponseEntity<GetPrevPostResponseDto> {
+        val query = GetPrevPostIdQuery(
+            userId = userId, postUuid = postId, sortBy = dto.sortBy, sortOrder = dto.sortOrder
         )
+        val result = postReadService.getPrevPostIds(query)
+        return ResponseEntity.ok(result)
     }
 }

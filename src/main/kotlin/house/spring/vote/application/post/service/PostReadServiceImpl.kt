@@ -2,14 +2,12 @@ package house.spring.vote.application.post.service
 
 import house.spring.vote.application.error.NotFoundException
 import house.spring.vote.application.post.dto.query.GetPostsQuery
+import house.spring.vote.application.post.dto.query.GetPrevPostIdQuery
 import house.spring.vote.domain.repository.PostRepository
 import house.spring.vote.domain.service.CountKeyGenerator
 import house.spring.vote.domain.service.ObjectManager
 import house.spring.vote.infrastructure.entity.PostEntity
-import house.spring.vote.interfaces.controller.post.response.GetPostResponseDto
-import house.spring.vote.interfaces.controller.post.response.GetPostsResponseDto
-import house.spring.vote.interfaces.controller.post.response.GetPostsResponseDtoPost
-import house.spring.vote.interfaces.controller.post.response.PollResponseDto
+import house.spring.vote.interfaces.controller.post.response.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.redis.core.RedisTemplate
@@ -48,19 +46,16 @@ class PostReadServiceImpl(
         )
     }
 
+
     override fun getPosts(query: GetPostsQuery): GetPostsResponseDto {
-        val sort = when (query.sortOrder) {
-            SortOrder.ASCENDING -> Sort.by(Sort.Order.asc("id"))
-            SortOrder.DESCENDING -> Sort.by(Sort.Order.desc("id"))
-            else -> Sort.unsorted()
-        }
+        val sort = idSortOrderToSort(query.sortOrder)
         val pageable = PageRequest.of(0, PAGE_SIZE, sort)
 
         val cursor = query.cursor?.toLong() ?: if (query.sortOrder == SortOrder.DESCENDING) Long.MAX_VALUE else 0
         val posts = if (query.sortOrder == SortOrder.DESCENDING) {
-            postRepository.findAllByIdBiggerThanCursor(cursor, query.userId, pageable)
-        } else {
             postRepository.findAllByIdSmallerThanCursor(cursor, query.userId, pageable)
+        } else {
+            postRepository.findAllByIdBiggerThanCursor(cursor, query.userId, pageable)
         }
 
         return GetPostsResponseDto(
@@ -69,6 +64,31 @@ class PostReadServiceImpl(
             sortBy = query.sortBy,
             sortOrder = query.sortOrder
         )
+    }
+
+    override fun getPrevPostIds(query: GetPrevPostIdQuery): GetPrevPostResponseDto {
+        val post = postRepository.findByUuid(query.postUuid)
+            ?: throw NotFoundException("게시글을 찾을 수 없습니다. ($query.postUuid)")
+
+        val sort = idSortOrderToSort(query.sortOrder)
+        val pageable = PageRequest.of(0, PAGE_SIZE, sort)
+        val prevPost = if (query.sortOrder == SortOrder.DESCENDING) {
+            postRepository.findAllByIdSmallerThanCursor(post.id!!, query.userId, pageable)
+        } else {
+            postRepository.findAllByIdBiggerThanCursor(post.id!!, query.userId, pageable)
+        }
+
+        return GetPrevPostResponseDto(
+            unReadPostIds = prevPost.map { it.uuid }
+        )
+    }
+
+    private fun idSortOrderToSort(sortOrder: SortOrder): Sort {
+        return when (sortOrder) {
+            SortOrder.ASCENDING -> Sort.by(Sort.Order.asc("id"))
+            SortOrder.DESCENDING -> Sort.by(Sort.Order.desc("id"))
+            else -> Sort.unsorted()
+        }
     }
 
     private fun PostEntity.toDto(): GetPostsResponseDtoPost {
@@ -84,6 +104,7 @@ class PostReadServiceImpl(
             updatedAt = this.updatedAt
         )
     }
+
 
     companion object {
         private const val PAGE_SIZE = 20

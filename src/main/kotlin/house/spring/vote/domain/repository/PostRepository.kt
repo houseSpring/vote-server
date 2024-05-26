@@ -22,4 +22,5 @@ interface PostRepository : JpaRepository<PostEntity, Long> {
         @Param("userId") userId: Long,
         pageable: Pageable
     ): ArrayList<PostEntity>
+
 }
