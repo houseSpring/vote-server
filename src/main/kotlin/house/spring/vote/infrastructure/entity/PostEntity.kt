@@ -2,10 +2,10 @@ package house.spring.vote.infrastructure.entity
 
 import house.spring.vote.domain.model.PickType
 import jakarta.persistence.*
+import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.annotation.CreatedDate
 import java.time.LocalDateTime
-import java.util.*
 
 @Entity
 @Table(
@@ -14,12 +14,13 @@ import java.util.*
         Index(name = "idx_post_cursor", columnList = "createdAt")
     ]
 )
+@DynamicUpdate
 class PostEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(nullable = false, unique = true)
-    val uuid: String = UUID.randomUUID().toString(), // TODO: UUID.randomUUID() 해결 필요
+    val uuid: String,
     @Column(nullable = false)
     val title: String,
     @Column(nullable = false)
@@ -27,7 +28,7 @@ class PostEntity(
     @Column(nullable = false)
     val pickType: PickType,
     @Column()
-    var imageUrl: String? = null,
+    var imageKey: String? = null,
     @OneToMany(
         mappedBy = "post",
         cascade = [CascadeType.ALL],

@@ -13,7 +13,7 @@ data class GetPostsResponseDto(
 
 data class GetPostsResponseDtoPost(
     val id: String,
-    val title:String,
+    val title: String,
     val imageUrl: String?,
     val participantCount: Int,
     val createdAt: LocalDateTime,

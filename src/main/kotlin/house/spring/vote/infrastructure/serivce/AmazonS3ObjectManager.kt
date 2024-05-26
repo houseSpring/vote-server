@@ -2,15 +2,19 @@ package house.spring.vote.infrastructure.serivce
 
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client
-import aws.sdk.kotlin.services.s3.model.*
+import aws.sdk.kotlin.services.s3.model.CopyObjectRequest
+import aws.sdk.kotlin.services.s3.model.DeleteObjectRequest
+import aws.sdk.kotlin.services.s3.model.GetObjectRequest
+import aws.sdk.kotlin.services.s3.model.PutObjectRequest
 import aws.sdk.kotlin.services.s3.presigners.presignGetObject
 import aws.sdk.kotlin.services.s3.presigners.presignPutObject
+import house.spring.vote.domain.service.ObjectManager
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import kotlin.time.Duration.Companion.minutes
 
 @Component
-class S3ImageManager(
+class AmazonS3ObjectManager(
     @Value("\${aws.s3.bucket}")
     private val bucket: String,
     @Value("\${aws.s3.region}")
@@ -19,54 +23,54 @@ class S3ImageManager(
     private val accessKeyId: String,
     @Value("\${aws.s3.secretAccessKey}")
     private val secretAccessKey: String
-) {
+) : ObjectManager {
 
     private val s3Client: S3Client = S3Client {
-        region = this@S3ImageManager.region
+        region = this@AmazonS3ObjectManager.region
         credentialsProvider = StaticCredentialsProvider {
-            accessKeyId = this@S3ImageManager.accessKeyId
-            secretAccessKey = this@S3ImageManager.secretAccessKey
+            accessKeyId = this@AmazonS3ObjectManager.accessKeyId
+            secretAccessKey = this@AmazonS3ObjectManager.secretAccessKey
         }
     }
 
     private val PRESIGNED_URL_EXPIRATION = 10.minutes
 
-    fun generateDownloadUrl(objectKey: String): String {
+    override fun generateDownloadUrl(objectKey: String): String {
         return "https://${bucket}.s3.${region}.amazonaws.com/$objectKey"
     }
 
-    suspend fun generateUploadUrl(objectKey: String): String {
+    override suspend fun generateUploadUrl(objectKey: String): String {
         val putObjectRequest = PutObjectRequest {
-            bucket = this@S3ImageManager.bucket
+            bucket = this@AmazonS3ObjectManager.bucket
             key = objectKey
         }
         val presignedRequest = s3Client.presignPutObject(putObjectRequest, PRESIGNED_URL_EXPIRATION)
         return presignedRequest.url.toString()
     }
 
-    suspend fun generateSignedDownloadUrl(objectKey: String): String {
+    override suspend fun generateSignedDownloadUrl(objectKey: String): String {
         val getObjectRequest = GetObjectRequest {
-            bucket = this@S3ImageManager.bucket
+            bucket = this@AmazonS3ObjectManager.bucket
             key = objectKey
         }
         val presignedRequest = s3Client.presignGetObject(getObjectRequest, PRESIGNED_URL_EXPIRATION)
         return presignedRequest.url.toString()
     }
 
-    suspend fun copyObject(sourceKey: String, destinationKey: String): CopyObjectResponse {
+    override suspend fun copyObject(sourceKey: String, destinationKey: String) {
         val copObjectRequest = CopyObjectRequest {
-            copySource = "${this@S3ImageManager.bucket}/$sourceKey"
-            bucket = this@S3ImageManager.bucket
+            copySource = "${this@AmazonS3ObjectManager.bucket}/$sourceKey"
+            bucket = this@AmazonS3ObjectManager.bucket
             key = destinationKey
         }
-        return s3Client.copyObject(copObjectRequest)
+        s3Client.copyObject(copObjectRequest)
     }
 
-    private suspend fun deleteObject(sourceKey: String, destinationKey: String): DeleteObjectResponse {
+    override suspend fun deleteObject(objectKey: String) {
         val deleteObjectRequest = DeleteObjectRequest {
-            bucket = this@S3ImageManager.bucket
-            key = sourceKey
+            bucket = this@AmazonS3ObjectManager.bucket
+            key = objectKey
         }
-        return s3Client.deleteObject(deleteObjectRequest)
+        s3Client.deleteObject(deleteObjectRequest)
     }
 }

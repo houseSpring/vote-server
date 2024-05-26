@@ -13,10 +13,10 @@ import house.spring.vote.domain.factory.PostFactory
 import house.spring.vote.domain.model.Post
 import house.spring.vote.domain.repository.PickedPollRepository
 import house.spring.vote.domain.repository.PostRepository
-import house.spring.vote.domain.service.ImageUrlGenerator
+import house.spring.vote.domain.service.ImageKeyGenerator
+import house.spring.vote.domain.service.ObjectManager
 import house.spring.vote.infrastructure.entity.PickedPollEntity
 import house.spring.vote.infrastructure.mapper.PostMapper
-import house.spring.vote.infrastructure.serivce.S3ImageManager
 import house.spring.vote.interfaces.controller.post.response.CreatePickResponseDto
 import house.spring.vote.interfaces.controller.post.response.GenerateImageUploadUrlResponseDto
 import jakarta.transaction.Transactional
@@ -27,8 +27,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class PostWriteServiceImpl(
-    private val s3ImageManager: S3ImageManager,
-    private val imageUrlGenerator: ImageUrlGenerator,
+    private val objectManager: ObjectManager,
+    private val imageKeyGenerator: ImageKeyGenerator,
     private val postRepository: PostRepository,
     private val pickedPollRepository: PickedPollRepository,
     private val postFactory: PostFactory,
@@ -37,34 +37,40 @@ class PostWriteServiceImpl(
     private val eventPublisher: ApplicationEventPublisher,
 ) : PostWriteService {
     override suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): GenerateImageUploadUrlResponseDto {
-        val imageKey = imageUrlGenerator.generateTempImageKey(command.userId.toString())
-        val presignedUrl = s3ImageManager.generateUploadUrl(imageKey)
+        val imageKey = imageKeyGenerator.generateTempImageKey(command.userId)
+        val presignedUrl = objectManager.generateUploadUrl(imageKey)
         return GenerateImageUploadUrlResponseDto(presignedUrl, imageKey)
     }
 
-    // TODO: Poll갯수 제한이 필요할 수 있음 -> 논의 필요
     @Transactional
-    override suspend fun create(command: CreatePostCommand): String = withContext(Dispatchers.IO) {
+    override suspend fun create(command: CreatePostCommand): String {
         val post = postFactory.create(command.title,
             command.userId,
             command.pickType,
             command.imageKey,
             command.polls.map { pollFactory.create(it.title) })
-        val postEntity = postMapper.toEntity(post).let { postRepository.save(it) }
+
+        if (post.validatePollsSize()) {
+            throw BadRequestException("투표 항목 갯수가 올바르지 않습니다.")
+        }
 
         if (post.hasImage()) {
-            postEntity.imageUrl = generateAndCopyImage(postEntity.uuid, command.imageKey!!)
-            postRepository.save(postEntity)// TODO: dirty checking이 동작하지 않는 부분 확인 필요
+            post.imageKey = generateAndCopyImage(post.id.uuid, post.imageKey!!)
         }
-        return@withContext postEntity.uuid
+
+        val postEntity = withContext(Dispatchers.IO) {
+            postRepository.save(postMapper.toEntity(post))
+        }
+
+        return postEntity.uuid
     }
 
     @Transactional
     override fun pickPost(command: PickPostCommand): CreatePickResponseDto {
         val postEntity = postRepository.findByUuid(command.postUUID)
             ?: throw NotFoundException("게시글을 찾을 수 없습니다. (${command.postUUID})")
-
         val post = postMapper.toDomain(postEntity)
+
         validatePickedPollCommand(post, command)
 
         val pickedPollsEntities = command.pickedPollIds.map { pollId ->
@@ -82,7 +88,7 @@ class PostWriteServiceImpl(
     }
 
     private fun validatePickedPollCommand(post: Post, command: PickPostCommand) {
-        if (this.hasUserAlreadyPicked(post.id!!.incrementId, command.userId)) {
+        if (this.hasUserAlreadyPicked(post.id.incrementId!!, command.userId)) {
             throw ConflictException("이미 투표한 게시물입니다. (${post.id.uuid})")
         }
         if (this.hasInvalidPollId(post, command.pickedPollIds)) {
@@ -101,12 +107,14 @@ class PostWriteServiceImpl(
         return pickedPollRepository.findAllByPostIdAndUserId(postId, userId).isNotEmpty()
     }
 
-    private suspend fun generateAndCopyImage(postId: String, source: String): String {
-        val destinationKey = imageUrlGenerator.generateImageKey(postId)
+    private suspend fun generateAndCopyImage(postId: String, sourceKey: String): String {
+        val destinationKey = imageKeyGenerator.generateImageKey(postId)
         try {
-            s3ImageManager.copyObject(source, destinationKey)
+            withContext(Dispatchers.IO) {
+                objectManager.copyObject(sourceKey, destinationKey)
+            }
         } catch (e: Exception) {
-            throw InternalServerException("이미지 복사에 실패했습니다. ($source -> $destinationKey)")
+            throw InternalServerException("이미지 복사에 실패했습니다. ($sourceKey -> $destinationKey)")
         }
         return destinationKey
     }

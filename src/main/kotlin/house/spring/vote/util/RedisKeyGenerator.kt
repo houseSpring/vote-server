@@ -1,6 +1,16 @@
 package house.spring.vote.util
 
-object RedisKeyGenerator {
-    fun generatePickPollKey(pollId: Long): String = "pick:$pollId"
-    fun generatePickPostKey(postId: Long): String = "pick:post:$postId"
+import house.spring.vote.domain.service.CountKeyGenerator
+import org.springframework.stereotype.Component
+
+@Component
+class RedisKeyGenerator : CountKeyGenerator {
+
+    override fun generatePickPollCountKey(pollId: Long): String {
+        return "pick:poll:${pollId}"
+    }
+
+    override fun generatePickPostCountKey(postId: Long): String {
+        return "pick:post:${postId}"
+    }
 }

@@ -11,10 +11,11 @@ class PostMapper(
 ) {
     fun toEntity(domain: Post): PostEntity {
         val entity = PostEntity(
+            uuid = domain.id.uuid,
             title = domain.title,
             userId = domain.userId,
             pickType = domain.pickType,
-            imageUrl = domain.imageUrl,
+            imageKey = domain.imageKey,
         )
         domain.polls.forEach { poll ->
             entity.addPoll(pollMapper.toEntity(poll))
@@ -23,18 +24,12 @@ class PostMapper(
     }
 
     fun toDomain(entity: PostEntity): Post {
-        val postId = if (entity.id != null) {
-            PostId(entity.id, entity.uuid)
-        } else {
-            null
-        }
-
         return Post(
-            id = postId,
+            id = PostId(entity.id, entity.uuid),
             title = entity.title,
             userId = entity.userId,
             pickType = entity.pickType,
-            imageUrl = entity.imageUrl,
+            imageKey = entity.imageKey,
             polls = entity.polls.map { pollMapper.toDomain(it) }
         )
     }

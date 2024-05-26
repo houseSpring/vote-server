@@ -3,12 +3,13 @@ package house.spring.vote.application.post.service
 import house.spring.vote.application.error.NotFoundException
 import house.spring.vote.application.post.dto.query.GetPostsQuery
 import house.spring.vote.domain.repository.PostRepository
+import house.spring.vote.domain.service.CountKeyGenerator
+import house.spring.vote.domain.service.ObjectManager
 import house.spring.vote.infrastructure.entity.PostEntity
 import house.spring.vote.interfaces.controller.post.response.GetPostResponseDto
 import house.spring.vote.interfaces.controller.post.response.GetPostsResponseDto
 import house.spring.vote.interfaces.controller.post.response.GetPostsResponseDtoPost
 import house.spring.vote.interfaces.controller.post.response.PollResponseDto
-import house.spring.vote.util.RedisKeyGenerator
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.redis.core.RedisTemplate
@@ -19,20 +20,22 @@ import javax.swing.SortOrder
 class PostReadServiceImpl(
     private val postRepository: PostRepository,
     private val redisTemplate: RedisTemplate<String, String>,
+    private val objectManager: ObjectManager,
+    private val countKeyGenerator: CountKeyGenerator
 ) : PostReadService {
     override fun getPost(postUUId: String): GetPostResponseDto {
         val postEntity = postRepository.findByUuid(postUUId)
             ?: throw NotFoundException("게시글을 찾을 수 없습니다. ($postUUId)")
-        val pickPostKey = RedisKeyGenerator.generatePickPostKey(postEntity.id!!)
+        val pickPostKey = countKeyGenerator.generatePickPostCountKey(postEntity.id!!)
         val pickPostCount = redisTemplate.opsForValue().get(pickPostKey)?.toInt() ?: 0
 
         return GetPostResponseDto(
             id = postEntity.uuid,
             title = postEntity.title,
-            imageUrl = postEntity.imageUrl,
+            imageUrl = postEntity.imageKey?.let { objectManager.generateDownloadUrl(it) },
             participantCount = pickPostCount,
             polls = postEntity.polls.map {
-                val pickPollKey = RedisKeyGenerator.generatePickPollKey(it.id!!)
+                val pickPollKey = countKeyGenerator.generatePickPollCountKey(it.id!!)
                 val pickPollCount = redisTemplate.opsForValue().get(pickPollKey)?.toInt() ?: 0
                 PollResponseDto(
                     id = it.id,
@@ -69,13 +72,13 @@ class PostReadServiceImpl(
     }
 
     private fun PostEntity.toDto(): GetPostsResponseDtoPost {
-        val participantCount = RedisKeyGenerator.generatePickPostKey(this.id!!).let { key ->
+        val participantCount = countKeyGenerator.generatePickPostCountKey(this.id!!).let { key ->
             redisTemplate.opsForValue().get(key)?.toInt() ?: 0
         }
         return GetPostsResponseDtoPost(
             id = this.uuid,
             title = this.title,
-            imageUrl = this.imageUrl,
+            imageUrl = this.imageKey?.let { objectManager.generateDownloadUrl(it) },
             participantCount = participantCount,
             createdAt = this.createdAt,
             updatedAt = this.updatedAt

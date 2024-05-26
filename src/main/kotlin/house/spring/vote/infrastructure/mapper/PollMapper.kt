@@ -12,6 +12,7 @@ class PollMapper {
             title = domain.title
         )
     }
+
     fun toDomain(entity: PollEntity): Poll {
         return Poll(
             id = entity.id,

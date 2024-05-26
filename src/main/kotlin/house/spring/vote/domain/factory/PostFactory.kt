@@ -12,23 +12,24 @@ class PostFactory {
         title: String,
         userId: Long,
         pickType: PickType,
-        imageUrl: String?,
+        imageKey: String?,
         polls: List<Poll>
     ): Post {
         return Post(
             title = title,
             userId = userId,
             pickType = pickType,
-            imageUrl = imageUrl,
+            imageKey = imageKey,
             polls = polls
         )
     }
+
     fun reconstitute(
         id: PostId,
         title: String,
         userId: Long,
         pickType: PickType,
-        imageUrl: String,
+        imageKey: String,
         polls: List<Poll>
     ): Post {
         return Post(
@@ -36,7 +37,7 @@ class PostFactory {
             title = title,
             userId = userId,
             pickType = pickType,
-            imageUrl = imageUrl,
+            imageKey = imageKey,
             polls = polls
         )
     }
