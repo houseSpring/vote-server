@@ -8,6 +8,7 @@ import house.spring.vote.application.post.service.PostReadService
 import house.spring.vote.application.post.service.PostWriteService
 import house.spring.vote.interfaces.controller.post.request.*
 import house.spring.vote.interfaces.controller.post.response.*
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -29,7 +30,7 @@ class PostController(
     }
 
     @PostMapping("/posts")
-    suspend fun createPost(@RequestBody dto: CreatePostRequestDto): ResponseEntity<CreatePostResponseDto> {
+    suspend fun createPost(@Valid @RequestBody dto: CreatePostRequestDto): ResponseEntity<CreatePostResponseDto> {
         val command = dto.toCommand(userId)
         val result = this.postWriteService.create(command)
         return ResponseEntity.status(HttpStatus.CREATED).body(CreatePostResponseDto(result))
@@ -37,7 +38,7 @@ class PostController(
 
     @PostMapping("/posts/{id}/pick")
     fun pickPost(
-        @PathVariable("id") postId: String, @RequestBody dto: PickPostRequestDto
+        @PathVariable("id") postId: String, @Valid @RequestBody dto: PickPostRequestDto
     ): ResponseEntity<CreatePickResponseDto> {
         val command = PickPostCommand(postId, userId, dto.pickedPollIds)
         val result = this.postWriteService.pickPost(command)
@@ -46,7 +47,7 @@ class PostController(
 
 
     @GetMapping("/posts")
-    fun getPosts(@ModelAttribute dto: GetPostsRequestDto): ResponseEntity<GetPostsResponseDto> {
+    fun getPosts(@Valid @ModelAttribute dto: GetPostsRequestDto): ResponseEntity<GetPostsResponseDto> {
         val query = GetPostsQuery(
             cursor = dto.cursor, sortBy = dto.sortBy, sortOrder = dto.sortOrder, userId = userId
         )

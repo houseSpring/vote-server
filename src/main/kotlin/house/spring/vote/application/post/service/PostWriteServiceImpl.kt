@@ -38,8 +38,8 @@ class PostWriteServiceImpl(
 ) : PostWriteService {
     override suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): GenerateImageUploadUrlResponseDto {
         val imageKey = imageKeyGenerator.generateTempImageKey(command.userId)
-        val presignedUrl = objectManager.generateUploadUrl(imageKey)
-        return GenerateImageUploadUrlResponseDto(presignedUrl, imageKey)
+        val uploadUrl = objectManager.generateUploadUrl(imageKey)
+        return GenerateImageUploadUrlResponseDto(uploadUrl, imageKey)
     }
 
     @Transactional

@@ -41,8 +41,7 @@ dependencies {
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis:3.2.5")
     // Kafka
-    implementation("org.springframework.kafka:spring-kafka:3.0.10")
-
+    //implementation("org.springframework.kafka:spring-kafka:3.0.10")
 
     runtimeOnly("com.h2database:h2")
 

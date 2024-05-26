@@ -1,4 +1,4 @@
-package house.spring.vote.util
+package house.spring.vote.infrastructure.serivce
 
 import house.spring.vote.domain.service.CountKeyGenerator
 import org.springframework.stereotype.Component
