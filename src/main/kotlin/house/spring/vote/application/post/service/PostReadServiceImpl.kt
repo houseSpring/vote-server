@@ -55,9 +55,9 @@ class PostReadServiceImpl(
 
         val cursor = query.cursor?.toLong() ?: if (query.sortOrder == SortOrder.DESCENDING) Long.MAX_VALUE else 0
         val posts = if (query.sortOrder == SortOrder.DESCENDING) {
-            postRepository.findAllByIdBiggerThanCursor(cursor, pageable)
+            postRepository.findAllByIdBiggerThanCursor(cursor, query.userId, pageable)
         } else {
-            postRepository.findAllByIdSmallerThanCursor(cursor, pageable)
+            postRepository.findAllByIdSmallerThanCursor(cursor, query.userId, pageable)
         }
 
         return GetPostsResponseDto(

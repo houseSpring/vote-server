@@ -2,7 +2,13 @@ package house.spring.vote.infrastructure.entity
 
 import jakarta.persistence.*
 
-@Entity(name = "SelectedPoll")
+@Entity()
+@Table(
+    name = "picked_poll",
+    indexes = [
+        Index(name = "idx_user_post", columnList = "userId, postId"),
+    ]
+)
 class PickedPollEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -51,7 +51,8 @@ class PostController(
         val query = GetPostsQuery(
             cursor = dto.cursor,
             sortBy = dto.sortBy,
-            sortOrder = dto.sortOrder
+            sortOrder = dto.sortOrder,
+            userId = userId
         )
         val result = postReadService.getPosts(query)
         return ResponseEntity.ok(result)
