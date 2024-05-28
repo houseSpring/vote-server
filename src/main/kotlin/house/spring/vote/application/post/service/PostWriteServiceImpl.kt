@@ -56,7 +56,7 @@ class PostWriteServiceImpl(
             command.imageKey,
             command.polls.map { pollFactory.create(it.title) })
 
-        val validateResult = post.validatePost()
+        val validateResult = post.validateForCreation()
         if (validateResult is ValidationResult.Error) {
             throw validateResult.exception
         }

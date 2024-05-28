@@ -13,10 +13,14 @@ class User(
     var password: String? = null
 
     fun validateDeviceIdUnique(userRepository: UserRepository): ValidationResult {
-        return if (userRepository.existsByDeviceId(deviceId!!)) {
+        return if (isDeviceAlreadyRegistered(userRepository)) {
             ValidationResult.Error(ConflictException("${ErrorCode.ALREADY_REGISTERED_DEVICE} ${deviceId!!}"))
         } else {
             ValidationResult.Success
         }
+    }
+
+    private fun isDeviceAlreadyRegistered(userRepository: UserRepository): Boolean {
+        return userRepository.existsByDeviceId(deviceId!!)
     }
 }

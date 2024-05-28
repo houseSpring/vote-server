@@ -6,7 +6,7 @@ import house.spring.vote.infrastructure.entity.UserEntity
 import org.springframework.stereotype.Component
 
 @Component
-class UserMapperImpl: UserMapper {
+class UserMapperImpl : UserMapper {
     override fun toDomain(entity: UserEntity): User {
         return User(
             id = entity.id!!,

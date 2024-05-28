@@ -17,11 +17,12 @@ data class Post(
 ) {
     fun hasImage(): Boolean = imageKey != null
 
-    fun validatePost(): ValidationResult {
-        if (this.validatePollsSize()) {
-            return ValidationResult.Error(BadRequestException(ErrorCode.INVALID_POLL_SIZE))
+    fun validateForCreation(): ValidationResult {
+        return if (!this.isPollsSizeValid()) {
+            ValidationResult.Error(BadRequestException(ErrorCode.INVALID_POLL_SIZE))
+        } else {
+            ValidationResult.Success
         }
-        return ValidationResult.Success
     }
 
     fun validatePickedPoll(
@@ -29,31 +30,30 @@ data class Post(
         pickedPollIds: List<Long>,
         pickedPollRepository: PickedPollRepository
     ): ValidationResult {
-        if (hasUserAlreadyPicked(this.id.incrementId!!, userId, pickedPollRepository)) {
-            return ValidationResult.Error(ConflictException("${ErrorCode.ALREADY_PICKED_POST} (${this.id.uuid})"))
+        return if (!isPickedPollsSizeValid(pickedPollIds.size)) {
+            ValidationResult.Error(BadRequestException(ErrorCode.INVALID_PICKED_POLL_SIZE))
+        } else if (isAlreadyPicked(this.id.incrementId!!, userId, pickedPollRepository)) {
+            ValidationResult.Error(ConflictException("${ErrorCode.ALREADY_PICKED_POST} (${this.id.uuid})"))
+        } else if (hasInvalidPollId(pickedPollIds)) {
+            ValidationResult.Error(NotFoundException("${ErrorCode.POLL_NOT_FOUND} (${pickedPollIds.joinToString()})"))
+        } else {
+            ValidationResult.Success
         }
-        if (hasInvalidPollId(pickedPollIds)) {
-            return ValidationResult.Error(NotFoundException("${ErrorCode.POLL_NOT_FOUND} (${pickedPollIds.joinToString()})"))
-        }
-        if (!validatePickedPollsSize(pickedPollIds.size)) {
-            return ValidationResult.Error(BadRequestException(ErrorCode.INVALID_PICKED_POLL_SIZE))
-        }
-        return ValidationResult.Success
     }
 
-    private fun validatePollsSize(): Boolean {
+    private fun isPollsSizeValid(): Boolean {
         return polls.size in (POLL_MIN_SIZE + 1)..<POLL_MAX_SIZE
     }
 
-    private fun validatePickedPollsSize(size: Int): Boolean {
+    private fun isPickedPollsSizeValid(size: Int): Boolean {
         return when (pickType) {
             PickType.Multi -> size >= 2
             PickType.Single -> size == 1
         }
     }
 
-    private fun hasUserAlreadyPicked(postId: Long, userId: Long, pickedPollRepository: PickedPollRepository): Boolean {
-        return pickedPollRepository.findAllByPostIdAndUserId(postId, userId).isNotEmpty()
+    private fun isAlreadyPicked(postId: Long, userId: Long, pickedPollRepository: PickedPollRepository): Boolean {
+        return pickedPollRepository.existsByPostIdAndUserId(postId, userId)
     }
 
     private fun hasInvalidPollId(pollIds: List<Long>): Boolean {
