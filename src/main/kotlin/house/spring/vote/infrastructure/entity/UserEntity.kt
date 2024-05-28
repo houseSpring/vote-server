@@ -5,7 +5,8 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
 
-@Entity(name = "appUser")
+@Entity()
+@Table(name = "app_user", indexes = [Index(name = "idx_device_id", columnList = "deviceId")])
 class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
