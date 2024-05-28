@@ -10,7 +10,15 @@ class RedisKeyGenerator : CountKeyGenerator {
         return "pick:poll:${pollId}"
     }
 
+    override fun generatePickPollCountKeys(pollIds: List<Long>): List<String> {
+        return pollIds.map { generatePickPollCountKey(it) }
+    }
+
     override fun generatePickPostCountKey(postId: Long): String {
         return "pick:post:${postId}"
+    }
+
+    override fun generatePickPostCountKeys(postIds: List<Long>): List<String> {
+        return postIds.map { generatePickPostCountKey(it) }
     }
 }

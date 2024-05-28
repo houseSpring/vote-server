@@ -3,44 +3,36 @@ package house.spring.vote.application.post.service
 import house.spring.vote.application.error.NotFoundException
 import house.spring.vote.application.post.dto.query.GetPostsQuery
 import house.spring.vote.application.post.dto.query.GetPrevPostIdQuery
+import house.spring.vote.domain.repository.ParticipantCountRepository
 import house.spring.vote.domain.repository.PostRepository
-import house.spring.vote.domain.service.CountKeyGenerator
 import house.spring.vote.domain.service.ObjectManager
+import house.spring.vote.infrastructure.entity.PollEntity
 import house.spring.vote.infrastructure.entity.PostEntity
 import house.spring.vote.interfaces.controller.post.response.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import javax.swing.SortOrder
 
 @Service
 class PostReadServiceImpl(
     private val postRepository: PostRepository,
-    private val redisTemplate: RedisTemplate<String, String>,
     private val objectManager: ObjectManager,
-    private val countKeyGenerator: CountKeyGenerator
+    private val participantCountRepository: ParticipantCountRepository,
 ) : PostReadService {
     override fun getPost(postUUId: String): GetPostResponseDto {
         val postEntity = postRepository.findByUuid(postUUId)
             ?: throw NotFoundException("게시글을 찾을 수 없습니다. ($postUUId)")
-        val pickPostKey = countKeyGenerator.generatePickPostCountKey(postEntity.id!!)
-        val pickPostCount = redisTemplate.opsForValue().get(pickPostKey)?.toInt() ?: 0
+
+        val participantCount = participantCountRepository.getPostCountById(postEntity.id!!)
+        val pollIdToParticipantCount = participantCountRepository.getPollIdToCountMap(postEntity.polls.map { it.id!! })
 
         return GetPostResponseDto(
             id = postEntity.uuid,
             title = postEntity.title,
             imageUrl = postEntity.imageKey?.let { objectManager.generateDownloadUrl(it) },
-            participantCount = pickPostCount,
-            polls = postEntity.polls.map {
-                val pickPollKey = countKeyGenerator.generatePickPollCountKey(it.id!!)
-                val pickPollCount = redisTemplate.opsForValue().get(pickPollKey)?.toInt() ?: 0
-                PollResponseDto(
-                    id = it.id,
-                    title = it.title,
-                    participantCount = pickPollCount
-                )
-            },
+            participantCount = participantCount,
+            polls = postEntity.polls.map { it.toDto(pollIdToParticipantCount[it.id]!!) },
             createdAt = postEntity.createdAt,
             updatedAt = postEntity.updatedAt
         )
@@ -58,8 +50,15 @@ class PostReadServiceImpl(
             postRepository.findAllByIdBiggerThanCursor(cursor, query.userId, pageable)
         }
 
+        val postIdToParticipantCount = participantCountRepository.getPostIdToCountMap(posts.map { it.id!! })
+
         return GetPostsResponseDto(
-            posts = posts.map { it.toDto() },
+            posts = posts.map {
+                it.toDto(
+                    postIdToParticipantCount[it.id]!!,
+                    it.imageKey?.let { imageKey -> objectManager.generateDownloadUrl(imageKey) }
+                )
+            },
             cursor = posts.lastOrNull()?.id?.toString(),
             sortBy = query.sortBy,
             sortOrder = query.sortOrder
@@ -91,14 +90,19 @@ class PostReadServiceImpl(
         }
     }
 
-    private fun PostEntity.toDto(): GetPostsResponseDtoPost {
-        val participantCount = countKeyGenerator.generatePickPostCountKey(this.id!!).let { key ->
-            redisTemplate.opsForValue().get(key)?.toInt() ?: 0
-        }
+    private fun PollEntity.toDto(participantCount: Int): PollResponseDto {
+        return PollResponseDto(
+            id = this.id!!,
+            title = this.title,
+            participantCount = participantCount
+        )
+    }
+
+    private fun PostEntity.toDto(participantCount: Int, imageUrl: String?): GetPostsResponseDtoPost {
         return GetPostsResponseDtoPost(
             id = this.uuid,
             title = this.title,
-            imageUrl = this.imageKey?.let { objectManager.generateDownloadUrl(it) },
+            imageUrl = imageUrl,
             participantCount = participantCount,
             createdAt = this.createdAt,
             updatedAt = this.updatedAt
