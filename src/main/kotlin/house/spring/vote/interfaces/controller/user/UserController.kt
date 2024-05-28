@@ -3,8 +3,8 @@ package house.spring.vote.interfaces.controller.user
 import house.spring.vote.application.user.dto.command.JoinCommand
 import house.spring.vote.application.user.dto.command.LoginCommand
 import house.spring.vote.application.user.dto.query.GetUserInfoQuery
-import house.spring.vote.application.user.service.UserReadService
-import house.spring.vote.application.user.service.UserWriteService
+import house.spring.vote.application.user.port.UserReadService
+import house.spring.vote.application.user.port.UserWriteService
 import house.spring.vote.interfaces.controller.user.request.LoginRequestDto
 import house.spring.vote.interfaces.controller.user.request.RegisterUserRequestDto
 import house.spring.vote.interfaces.controller.user.response.GetUserInfoResponseDto

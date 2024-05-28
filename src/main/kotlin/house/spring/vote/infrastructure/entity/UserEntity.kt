@@ -7,15 +7,14 @@ import java.time.LocalDateTime
 
 @Entity(name = "appUser")
 class UserEntity(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
     @Column(nullable = false)
     var nickname: String,
     @Column(nullable = true)
     var deviceId: String?
 ) {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

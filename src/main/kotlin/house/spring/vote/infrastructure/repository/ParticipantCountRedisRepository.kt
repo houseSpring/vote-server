@@ -1,8 +1,8 @@
 package house.spring.vote.infrastructure.repository
 
-import house.spring.vote.application.error.InternalServerException
-import house.spring.vote.domain.repository.ParticipantCountRepository
-import house.spring.vote.domain.service.CountKeyGenerator
+import house.spring.vote.domain.post.repository.ParticipantCountRepository
+import house.spring.vote.domain.post.service.CountKeyGenerator
+import house.spring.vote.util.excaption.InternalServerException
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 

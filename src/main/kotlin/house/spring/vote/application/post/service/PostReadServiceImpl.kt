@@ -1,14 +1,15 @@
 package house.spring.vote.application.post.service
 
-import house.spring.vote.application.error.NotFoundException
 import house.spring.vote.application.post.dto.query.GetPostsQuery
 import house.spring.vote.application.post.dto.query.GetPrevPostIdQuery
-import house.spring.vote.domain.repository.ParticipantCountRepository
-import house.spring.vote.domain.repository.PostRepository
-import house.spring.vote.domain.service.ObjectManager
+import house.spring.vote.application.post.port.PostReadService
+import house.spring.vote.domain.post.repository.ParticipantCountRepository
+import house.spring.vote.domain.post.repository.PostRepository
+import house.spring.vote.domain.post.service.ObjectManager
 import house.spring.vote.infrastructure.entity.PollEntity
 import house.spring.vote.infrastructure.entity.PostEntity
 import house.spring.vote.interfaces.controller.post.response.*
+import house.spring.vote.util.excaption.NotFoundException
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service

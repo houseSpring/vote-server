@@ -2,7 +2,7 @@ package house.spring.vote.interfaces.controller.post.request
 
 import house.spring.vote.application.post.dto.command.CreatePostCommand
 import house.spring.vote.application.post.dto.command.CreatePostCommandPoll
-import house.spring.vote.domain.model.PickType
+import house.spring.vote.domain.post.model.PickType
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty

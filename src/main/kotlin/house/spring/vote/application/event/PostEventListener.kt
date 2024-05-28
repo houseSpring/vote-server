@@ -1,9 +1,7 @@
 package house.spring.vote.application.event
 
-import house.spring.vote.domain.event.PickedPollEvent
-import house.spring.vote.domain.repository.ParticipantCountRepository
-import house.spring.vote.domain.service.CountKeyGenerator
-import org.springframework.data.redis.core.RedisTemplate
+import house.spring.vote.domain.post.event.PickedPollEvent
+import house.spring.vote.domain.post.repository.ParticipantCountRepository
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.transaction.event.TransactionPhase

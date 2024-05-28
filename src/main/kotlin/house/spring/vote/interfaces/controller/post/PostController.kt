@@ -4,8 +4,8 @@ import house.spring.vote.application.post.dto.command.GenerateImageUploadUrlComm
 import house.spring.vote.application.post.dto.command.PickPostCommand
 import house.spring.vote.application.post.dto.query.GetPostsQuery
 import house.spring.vote.application.post.dto.query.GetPrevPostIdQuery
-import house.spring.vote.application.post.service.PostReadService
-import house.spring.vote.application.post.service.PostWriteService
+import house.spring.vote.application.post.port.PostReadService
+import house.spring.vote.application.post.port.PostWriteService
 import house.spring.vote.interfaces.controller.post.request.*
 import house.spring.vote.interfaces.controller.post.response.*
 import jakarta.validation.Valid

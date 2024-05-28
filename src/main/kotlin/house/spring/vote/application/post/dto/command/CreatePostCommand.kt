@@ -1,6 +1,6 @@
 package house.spring.vote.application.post.dto.command
 
-import house.spring.vote.domain.model.PickType
+import house.spring.vote.domain.post.model.PickType
 
 data class CreatePostCommand(
     val title: String,

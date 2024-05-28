@@ -1,6 +1,6 @@
 package house.spring.vote.interfaces.controller.post.request
 
-import house.spring.vote.domain.model.SortBy
+import house.spring.vote.domain.post.model.SortBy
 import io.swagger.v3.oas.annotations.media.Schema
 import javax.swing.SortOrder
 

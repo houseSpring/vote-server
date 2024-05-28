@@ -1,6 +1,6 @@
 package house.spring.vote.interfaces.controller.post.response
 
-import house.spring.vote.domain.model.SortBy
+import house.spring.vote.domain.post.model.SortBy
 import java.time.LocalDateTime
 import javax.swing.SortOrder
 

@@ -1,6 +1,6 @@
 package house.spring.vote.infrastructure.entity
 
-import house.spring.vote.domain.model.PickType
+import house.spring.vote.domain.post.model.PickType
 import jakarta.persistence.*
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.UpdateTimestamp

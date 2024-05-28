@@ -1,9 +1,10 @@
 package house.spring.vote.application.user.service
 
-import house.spring.vote.application.error.NotFoundException
 import house.spring.vote.application.user.dto.query.GetUserInfoQuery
-import house.spring.vote.domain.repository.UserRepository
+import house.spring.vote.application.user.port.UserReadService
+import house.spring.vote.domain.user.repository.UserRepository
 import house.spring.vote.interfaces.controller.user.response.GetUserInfoResponseDto
+import house.spring.vote.util.excaption.NotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

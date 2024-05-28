@@ -1,7 +1,6 @@
 package house.spring.vote.interfaces.controller.post.request
 
-import house.spring.vote.domain.model.SortBy
-import house.spring.vote.domain.validation.ValidEnum
+import house.spring.vote.domain.post.model.SortBy
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Pattern
 import javax.swing.SortOrder
