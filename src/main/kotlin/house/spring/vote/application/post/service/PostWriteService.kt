@@ -6,7 +6,6 @@ import house.spring.vote.application.post.dto.command.PickPostCommand
 import house.spring.vote.application.post.port.EventPublisher
 import house.spring.vote.application.post.port.PickedPollMapper
 import house.spring.vote.application.post.port.PostMapper
-import house.spring.vote.application.post.port.PostWriteService
 import house.spring.vote.domain.post.event.PickedPollEvent
 import house.spring.vote.domain.post.factory.PickedPollFactory
 import house.spring.vote.domain.post.factory.PollFactory
@@ -29,7 +28,7 @@ import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 
 @Service
-class PostWriteServiceImpl(
+class PostWriteService(
     private val objectManager: ObjectManager,
     private val objectKeyGenerator: ObjectKeyGenerator,
     private val postRepository: PostRepository,
@@ -40,16 +39,16 @@ class PostWriteServiceImpl(
     private val pickedPollFactory: PickedPollFactory,
     private val pickedPollMapper: PickedPollMapper,
     private val eventPublisher: EventPublisher,
-) : PostWriteService {
-    override suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): GenerateImageUploadUrlResponseDto {
+) {
+    suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): GenerateImageUploadUrlResponseDto {
         val imageKey = objectKeyGenerator.generateTempImageKey(command.userId)
         val uploadUrl = objectManager.generateUploadUrl(imageKey)
         return GenerateImageUploadUrlResponseDto(uploadUrl, imageKey)
     }
 
     // TODO: 코루틴을 사용할때 transactional 어노테이션 주의 필요
-    @Transactional
-    override suspend fun create(command: CreatePostCommand): String {
+//    @Transactional
+    suspend fun create(command: CreatePostCommand): String {
         val post = postFactory.create(command.title,
             command.userId,
             command.pickType,
@@ -85,7 +84,7 @@ class PostWriteServiceImpl(
     }
 
     @Transactional
-    override fun pickPost(command: PickPostCommand): CreatePickResponseDto {
+    fun pickPost(command: PickPostCommand): CreatePickResponseDto {
         val postEntity = postRepository.findByUuid(command.postUUID)
             ?: throw NotFoundException("${ErrorCode.POST_NOT_FOUND} (${command.postUUID})")
         val post = postMapper.toDomain(postEntity)

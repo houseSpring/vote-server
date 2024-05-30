@@ -2,7 +2,6 @@ package house.spring.vote.application.post.service
 
 import house.spring.vote.application.post.dto.query.GetPostsQuery
 import house.spring.vote.application.post.dto.query.GetPrevPostIdQuery
-import house.spring.vote.application.post.port.PostReadService
 import house.spring.vote.domain.post.repository.ParticipantCountRepository
 import house.spring.vote.domain.post.repository.PostRepository
 import house.spring.vote.domain.post.service.ObjectManager
@@ -16,12 +15,12 @@ import org.springframework.stereotype.Service
 import javax.swing.SortOrder
 
 @Service
-class PostReadServiceImpl(
+class PostReadService(
     private val postRepository: PostRepository,
     private val objectManager: ObjectManager,
     private val participantCountRepository: ParticipantCountRepository,
-) : PostReadService {
-    override fun getPost(postUUId: String): GetPostResponseDto {
+) {
+    fun getPost(postUUId: String): GetPostResponseDto {
         val postEntity = postRepository.findByUuid(postUUId)
             ?: throw NotFoundException("게시글을 찾을 수 없습니다. ($postUUId)")
 
@@ -40,7 +39,7 @@ class PostReadServiceImpl(
     }
 
 
-    override fun getPosts(query: GetPostsQuery): GetPostsResponseDto {
+    fun getPosts(query: GetPostsQuery): GetPostsResponseDto {
         val sort = idSortOrderToSort(query.sortOrder)
         val pageable = PageRequest.of(0, PAGE_SIZE, sort)
 
@@ -66,7 +65,7 @@ class PostReadServiceImpl(
         )
     }
 
-    override fun getPrevPostIds(query: GetPrevPostIdQuery): GetPrevPostResponseDto {
+    fun getPrevPostIds(query: GetPrevPostIdQuery): GetPrevPostResponseDto {
         val post = postRepository.findByUuid(query.postUuid)
             ?: throw NotFoundException("게시글을 찾을 수 없습니다. ($query.postUuid)")
 

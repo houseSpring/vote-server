@@ -6,6 +6,7 @@ object ErrorCode {
 
     const val POST_NOT_FOUND = "게시글을 찾을 수 없습니다."
     const val POLL_NOT_FOUND = "투표 항목을 찾을 수 없습니다."
+    const val USER_NOT_FOUND = "사용자를 찾을 수 없습니다."
 
     const val ALREADY_REGISTERED_DEVICE = "이미 등록된 디바이스입니다."
     const val ALREADY_PICKED_POST = "이미 투표한 게시글입니다."
