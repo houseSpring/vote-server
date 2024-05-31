@@ -4,6 +4,8 @@ object ErrorCode {
     const val INVALID_POLL_SIZE = "투표 항목 갯수가 올바르지 않습니다."
     const val INVALID_PICKED_POLL_SIZE = "투표 항목 갯수가 올바르지 않습니다."
 
+    const val UNAUTHORIZED = "인증되지 않은 사용자입니다."
+
     const val POST_NOT_FOUND = "게시글을 찾을 수 없습니다."
     const val POLL_NOT_FOUND = "투표 항목을 찾을 수 없습니다."
     const val USER_NOT_FOUND = "사용자를 찾을 수 없습니다."

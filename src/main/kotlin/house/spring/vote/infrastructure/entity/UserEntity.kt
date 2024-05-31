@@ -14,7 +14,7 @@ class UserEntity(
     @Column(nullable = false)
     var nickname: String,
     @Column(nullable = true)
-    var deviceId: String?
+    var deviceId: String? = null,
 ) {
 
     @CreatedDate

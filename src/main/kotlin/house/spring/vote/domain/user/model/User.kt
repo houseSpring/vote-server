@@ -10,8 +10,6 @@ class User(
     var deviceId: String? = null,
     val nickname: String,
 ) {
-    var password: String? = null
-
     fun validateDeviceIdUnique(userRepository: UserRepository): ValidationResult {
         return if (isDeviceAlreadyRegistered(userRepository)) {
             ValidationResult.Error(ConflictException("${ErrorCode.ALREADY_REGISTERED_DEVICE} ${deviceId!!}"))
@@ -21,6 +19,6 @@ class User(
     }
 
     private fun isDeviceAlreadyRegistered(userRepository: UserRepository): Boolean {
-        return userRepository.existsByDeviceId(deviceId!!)
+        return userRepository.findByDeviceId(deviceId!!).isPresent
     }
 }

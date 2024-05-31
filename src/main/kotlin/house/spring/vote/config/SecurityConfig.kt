@@ -25,8 +25,8 @@ class SecurityConfig(
         http.csrf {
             it.disable()
         }.authorizeHttpRequests {
-            it.requestMatchers(HttpMethod.POST, "/user").permitAll()
-                .requestMatchers(HttpMethod.POST, "/login").permitAll()
+            it.requestMatchers(HttpMethod.POST, "/device-users").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
         }.sessionManagement {

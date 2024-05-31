@@ -1,5 +1,5 @@
 package house.spring.vote.application.user.dto.command
 
-data class JoinCommand(
+data class DeviceJoinCommand(
     val nickname: String, val deviceId: String
 )
