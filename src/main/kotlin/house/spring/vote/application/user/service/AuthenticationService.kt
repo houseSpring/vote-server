@@ -1,6 +1,5 @@
 package house.spring.vote.application.user.service
 
-import AuthenticationStrategy
 import house.spring.vote.application.user.dto.command.AuthenticationCommand
 import house.spring.vote.util.excaption.ErrorCode
 import house.spring.vote.util.excaption.UnAuthorizedException

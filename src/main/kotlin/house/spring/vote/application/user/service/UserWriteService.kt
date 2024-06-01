@@ -19,7 +19,7 @@ class UserWriteService(
     fun join(command: DeviceJoinCommand): Long {
         val user = userFactory.create(command.nickname, command.deviceId)
 
-        // TODO: 이후 회원 추가시 valdation 로직 도메인에서 분리
+        // TODO: 이후 회원 유형 추가시 valdation 구현부 도메인에서 분리
         val validationResult = user.validateDeviceIdUnique(userRepository)
         if (validationResult is ValidationResult.Error) {
             throw validationResult.exception

@@ -1,6 +1,7 @@
+package house.spring.vote.application.user.service
+
 import house.spring.vote.application.user.dto.command.AuthenticationCommand
 import house.spring.vote.application.user.port.UserMapper
-import house.spring.vote.application.user.service.CustomUserDetailsService
 import house.spring.vote.domain.user.repository.UserRepository
 import house.spring.vote.util.excaption.ErrorCode
 import house.spring.vote.util.excaption.NotFoundException
@@ -20,12 +21,13 @@ class DeviceIdAuthenticationStrategy(
     override fun authenticate(command: AuthenticationCommand): UserDetails {
         val user = userRepository.findByDeviceId(command.deviceId)
             .orElseThrow {
-                NotFoundException("${ErrorCode.USER_NOT_FOUND} (deviceId: ${command.deviceId})")
+                NotFoundException("${ErrorCode.UNAUTHORIZED} (deviceId: ${command.deviceId})")
             }
         return customUserDetailsService.createUserDetails(userMapper.toDomain(user))
     }
 }
 
+// TODO: 이메일 로그인 이후 디테일 구현 필요
 @Service("emailPasswordAuthenticationStrategy")
 class EmailPasswordAuthenticationStrategy(
     private val userRepository: UserRepository,
