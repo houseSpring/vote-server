@@ -29,6 +29,7 @@ class PostController(
     ): ResponseEntity<GenerateImageUploadUrlResponseDto> {
         val command = GenerateImageUploadUrlCommand(userDetails.username.toLong())
         val result = this.postWriteService.createImageUploadUrl(command)
+//        println("result:$result")
         return ResponseEntity.status(HttpStatus.CREATED).body(result)
     }
 

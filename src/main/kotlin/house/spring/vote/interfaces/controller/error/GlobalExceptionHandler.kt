@@ -19,8 +19,6 @@ class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
         val errors = e.bindingResult.fieldErrors.associate { it.field to it.defaultMessage }
-        println("MethodArgumentNotValidException")
-        println(errors)
         val response = ErrorResponse(HttpStatus.BAD_REQUEST.value(), errors)
         return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
@@ -29,8 +27,6 @@ class GlobalExceptionHandler {
     fun handleTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
         val error =
             "Invalid value '${e.value}' for parameter '${e.name}'. Expected type: ${e.requiredType?.simpleName}. Enum values: ${(e.requiredType?.enumConstants?.joinToString { it.toString() })}"
-        println("MethodArgumentTypeMismatchException")
-        println(error)
         val response = ErrorResponse(HttpStatus.BAD_REQUEST.value(), mapOf(e.name to error))
         return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }

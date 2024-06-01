@@ -7,6 +7,7 @@ import house.spring.vote.util.excaption.ConflictException
 import house.spring.vote.util.excaption.ErrorCode
 import house.spring.vote.util.excaption.NotFoundException
 
+// TODO: VO 검증 로직 추가
 data class Post(
     val id: PostId = PostId(),
     val title: String,

@@ -5,6 +5,7 @@ import house.spring.vote.application.user.port.UserMapper
 import house.spring.vote.domain.user.repository.UserRepository
 import house.spring.vote.util.excaption.ErrorCode
 import house.spring.vote.util.excaption.NotFoundException
+import house.spring.vote.util.excaption.UnAuthorizedException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 
@@ -21,7 +22,7 @@ class DeviceIdAuthenticationStrategy(
     override fun authenticate(command: AuthenticationCommand): UserDetails {
         val user = userRepository.findByDeviceId(command.deviceId)
             .orElseThrow {
-                NotFoundException("${ErrorCode.UNAUTHORIZED} (deviceId: ${command.deviceId})")
+                UnAuthorizedException("${ErrorCode.UNAUTHORIZED} (deviceId: ${command.deviceId})")
             }
         return customUserDetailsService.createUserDetails(userMapper.toDomain(user))
     }

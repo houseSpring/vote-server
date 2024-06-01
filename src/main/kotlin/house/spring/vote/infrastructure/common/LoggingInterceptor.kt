@@ -12,6 +12,7 @@ class LoggingInterceptor : HandlerInterceptor {
     private final val logger = LoggerFactory.getLogger(this.javaClass)
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+        logger.info("Request URL: (${request.method})${request.requestURI} FROM: ${request.remoteAddr}")
         request.setAttribute("startTime", System.currentTimeMillis())
         return true
     }
@@ -25,8 +26,8 @@ class LoggingInterceptor : HandlerInterceptor {
         val startTime = request.getAttribute("startTime") as Long
         val endTime = System.currentTimeMillis()
         val executionTime = endTime - startTime
-        logger.info("Request URL: ${request.requestURI} FROM: ${request.remoteAddr} - TIME: $executionTime ms")
 
+        logger.info("Response URL: e(${request.method})${request.requestURI} (${response.status})- TIME: $executionTime ms")
         if (ex != null) {
             logger.error("Exception: ${ex.message}")
             logger.error(ex.stackTraceToString())

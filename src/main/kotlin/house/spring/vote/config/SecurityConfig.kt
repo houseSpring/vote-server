@@ -1,6 +1,10 @@
 package house.spring.vote.config
 
 import house.spring.vote.infrastructure.security.JwtRequestFilter
+import io.swagger.v3.oas.models.Components
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.security.SecurityRequirement
+import io.swagger.v3.oas.models.security.SecurityScheme
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -19,6 +23,18 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 class SecurityConfig(
     private val jwtRequestFilter: JwtRequestFilter,
 ) {
+    @Bean
+    fun openApi(): OpenAPI {
+        val securityScheme = SecurityScheme()
+            .type(SecurityScheme.Type.HTTP)
+            .scheme("bearer")
+            .bearerFormat("JWT")
+
+        return OpenAPI().components(
+            Components().addSecuritySchemes("bearerAuth", securityScheme)
+        ).security(listOf(SecurityRequirement().addList("bearerAuth")))
+
+    }
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -27,6 +43,7 @@ class SecurityConfig(
         }.authorizeHttpRequests {
             it.requestMatchers(HttpMethod.POST, "/device-users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                .requestMatchers("/", "/error").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
         }.sessionManagement {
@@ -35,6 +52,13 @@ class SecurityConfig(
 
         return http.build()
     }
+
+//    @Bean
+//    fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
+//        return http.csrf {
+//            it.disable()
+//        }.build()
+//    }
 
     @Bean
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager {
