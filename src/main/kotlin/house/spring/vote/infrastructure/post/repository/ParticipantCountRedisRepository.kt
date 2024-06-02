@@ -1,5 +1,6 @@
 package house.spring.vote.infrastructure.post.repository
 
+import house.spring.vote.domain.post.model.PostId
 import house.spring.vote.domain.post.repository.ParticipantCountRepository
 import house.spring.vote.domain.post.service.CountKeyGenerator
 import house.spring.vote.util.excaption.InternalServerException
@@ -11,19 +12,19 @@ class ParticipantCountRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
     private val countKeyGenerator: CountKeyGenerator,
 ) : ParticipantCountRepository {
-    override fun getPostIdToCountMap(ids: List<Long>): Map<Long, Int> {
-        return getIdToParticipantCountMap(ids) { countKeyGenerator.generatePickPostCountKeys(it) }
+    override fun getPostIdToCountMap(postIds: List<PostId>): Map<PostId, Int> {
+        return getIdToParticipantCountMap(postIds) { countKeyGenerator.generatePickPostCountKeys(it) }
     }
 
-    override fun getPostCountById(id: Long): Int {
-        return getParticipantCountById(id) { countKeyGenerator.generatePickPostCountKey(it) }
+    override fun getPostCountById(postId: PostId): Int {
+        return getParticipantCountById(postId) { countKeyGenerator.generatePickPostCountKey(it) }
     }
 
     override fun getPollIdToCountMap(ids: List<Long>): Map<Long, Int> {
         return getIdToParticipantCountMap(ids) { countKeyGenerator.generatePickPollCountKeys(it) }
     }
 
-    override fun countUpPost(postId: Long) {
+    override fun countUpPost(postId: PostId) {
         countUp(countKeyGenerator.generatePickPostCountKey(postId))
     }
 
@@ -38,26 +39,28 @@ class ParticipantCountRedisRepository(
 
     private fun countUpMultiple(keys: List<String>) {
         try {
-            redisTemplate.executePipelined { redisConnection ->
+            redisTemplate.executePipelined {
+                val operations = redisTemplate.opsForValue()
                 keys.forEach { key ->
-                    redisConnection.incr(key.toByteArray())
+                    operations.increment(key)
                 }
+                null
             }
         } catch (e: Exception) {
             throw InternalServerException(e.message ?: "Redis pipeline error")
         }
     }
 
-    private fun getIdToParticipantCountMap(
-        ids: List<Long>, keyGenerator: (List<Long>) -> List<String>
-    ): Map<Long, Int> {
-        val keys = keyGenerator(ids)
+    private fun <T> getIdToParticipantCountMap(
+        postIds: List<T>, keyGenerator: (List<T>) -> List<String>
+    ): Map<T, Int> {
+        val keys = keyGenerator(postIds)
         val counts = redisTemplate.opsForValue().multiGet(keys)!!.map { it?.toInt() ?: 0 }
-        return ids.zip(counts).associate { (id, count) -> id to count }
+        return postIds.zip(counts).associate { (id, count) -> id to count }
     }
 
-    private fun getParticipantCountById(id: Long, keyGenerator: (Long) -> String): Int {
-        val key = keyGenerator(id)
+    private fun getParticipantCountById(postId: PostId, keyGenerator: (PostId) -> String): Int {
+        val key = keyGenerator(postId)
         return redisTemplate.opsForValue().get(key)?.toInt() ?: 0
     }
 

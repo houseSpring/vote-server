@@ -10,6 +10,7 @@ class User(
     var deviceId: String? = null,
     val nickname: String,
 ) {
+    // TODO: 이후 회원 유형 추가시 validation 구현부 도메인에서 분리
     fun validateDeviceIdUnique(userRepository: UserRepository): ValidationResult {
         return if (isDeviceAlreadyRegistered(userRepository)) {
             ValidationResult.Error(ConflictException("${ErrorCode.ALREADY_REGISTERED_DEVICE} ${deviceId!!}"))
@@ -19,6 +20,12 @@ class User(
     }
 
     private fun isDeviceAlreadyRegistered(userRepository: UserRepository): Boolean {
-        return userRepository.findByDeviceId(deviceId!!).isPresent
+        return userRepository.findByDeviceId(deviceId!!) != null
+    }
+
+    companion object {
+        fun create(deviceId: String, nickname: String): User {
+            return User(deviceId = deviceId, nickname = nickname)
+        }
     }
 }

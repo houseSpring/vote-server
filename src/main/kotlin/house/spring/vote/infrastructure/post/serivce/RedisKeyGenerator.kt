@@ -1,5 +1,6 @@
 package house.spring.vote.infrastructure.post.serivce
 
+import house.spring.vote.domain.post.model.PostId
 import house.spring.vote.domain.post.service.CountKeyGenerator
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -18,11 +19,11 @@ class RedisKeyGenerator(
         return pollIds.map { generatePickPollCountKey(it) }
     }
 
-    override fun generatePickPostCountKey(postId: Long): String {
-        return "$pickPostPrefix:$postId"
+    override fun generatePickPostCountKey(postId: PostId): String {
+        return "$pickPostPrefix:${postId.incrementId!!}"
     }
 
-    override fun generatePickPostCountKeys(postIds: List<Long>): List<String> {
+    override fun generatePickPostCountKeys(postIds: List<PostId>): List<String> {
         return postIds.map { generatePickPostCountKey(it) }
     }
 }

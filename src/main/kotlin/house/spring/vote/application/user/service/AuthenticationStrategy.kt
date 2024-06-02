@@ -3,7 +3,6 @@ package house.spring.vote.application.user.service
 import house.spring.vote.application.user.dto.command.AuthenticationCommand
 import house.spring.vote.domain.user.repository.UserRepository
 import house.spring.vote.util.excaption.ErrorCode
-import house.spring.vote.util.excaption.NotFoundException
 import house.spring.vote.util.excaption.UnAuthorizedException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
@@ -19,9 +18,7 @@ class DeviceIdAuthenticationStrategy(
 ) : AuthenticationStrategy {
     override fun authenticate(command: AuthenticationCommand): UserDetails {
         val user = userRepository.findByDeviceId(command.deviceId)
-            .orElseThrow {
-                UnAuthorizedException("${ErrorCode.UNAUTHORIZED} (deviceId: ${command.deviceId})")
-            }
+            ?: throw UnAuthorizedException("${ErrorCode.USER_NOT_FOUND} (deviceId: ${command.deviceId})")
         return customUserDetailsService.createUserDetails(user)
     }
 }
@@ -34,9 +31,7 @@ class EmailPasswordAuthenticationStrategy(
 ) : AuthenticationStrategy {
     override fun authenticate(command: AuthenticationCommand): UserDetails {
         val user = userRepository.findByDeviceId(command.deviceId)
-            .orElseThrow {
-                NotFoundException("${ErrorCode.USER_NOT_FOUND} (deviceId: ${command.deviceId})")
-            }
+            ?: throw UnAuthorizedException("${ErrorCode.USER_NOT_FOUND} (deviceId: ${command.deviceId})")
         return customUserDetailsService.createUserDetails(user)
     }
 }

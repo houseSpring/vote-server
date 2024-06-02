@@ -6,6 +6,7 @@ import house.spring.vote.util.excaption.BadRequestException
 import house.spring.vote.util.excaption.ConflictException
 import house.spring.vote.util.excaption.ErrorCode
 import house.spring.vote.util.excaption.NotFoundException
+import java.time.LocalDateTime
 
 // TODO: VO 검증 로직 추가
 data class Post(
@@ -14,8 +15,26 @@ data class Post(
     val userId: Long,
     val pickType: PickType,
     var imageKey: String? = null,
-    val polls: List<Poll> = mutableListOf()
+    val polls: List<Poll> = mutableListOf(),
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 ) {
+
+    var updatedAt: LocalDateTime = LocalDateTime.now()
+        private set
+
+    constructor(
+        id: PostId,
+        title: String,
+        userId: Long,
+        pickType: PickType,
+        imageKey: String?,
+        polls: List<Poll>,
+        updatedAt: LocalDateTime,
+        createdAt: LocalDateTime
+    ) : this(id, title, userId, pickType, imageKey, polls, createdAt) {
+        this.updatedAt = updatedAt
+    }
+
     fun hasImage(): Boolean = imageKey != null
 
     fun validateForCreation(): ValidationResult {
@@ -53,8 +72,8 @@ data class Post(
         }
     }
 
-    private fun isAlreadyPicked(postId: Long, userId: Long, pickedPollRepository: PickedPollRepository): Boolean {
-        return pickedPollRepository.existsByPostIdAndUserId(postId, userId)
+    private fun isAlreadyPicked(postId: Long, userId: Long, pickedPollJpaRepository: PickedPollRepository): Boolean {
+        return pickedPollJpaRepository.existsByPostIdAndUserId(postId, userId)
     }
 
     private fun hasInvalidPollId(pollIds: List<Long>): Boolean {
@@ -66,5 +85,16 @@ data class Post(
     companion object {
         const val POLL_MAX_SIZE = 10
         const val POLL_MIN_SIZE = 2
+
+        fun create(
+            id: PostId = PostId(),
+            title: String,
+            userId: Long,
+            pickType: PickType,
+            imageKey: String? = null,
+            polls: List<Poll> = mutableListOf(),
+        ): Post {
+            return Post(id, title, userId, pickType, imageKey, polls)
+        }
     }
 }

@@ -2,17 +2,15 @@ package house.spring.vote.application.post.service
 
 import house.spring.vote.application.post.dto.query.GetPostsQuery
 import house.spring.vote.application.post.dto.query.GetPrevPostIdQuery
+import house.spring.vote.domain.post.model.Poll
+import house.spring.vote.domain.post.model.Post
 import house.spring.vote.domain.post.repository.ParticipantCountRepository
+import house.spring.vote.domain.post.repository.PostQuery
 import house.spring.vote.domain.post.repository.PostRepository
 import house.spring.vote.domain.post.service.ObjectManager
-import house.spring.vote.infrastructure.post.entity.PollEntity
-import house.spring.vote.infrastructure.post.entity.PostEntity
 import house.spring.vote.interfaces.controller.post.response.*
 import house.spring.vote.util.excaption.NotFoundException
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
-import javax.swing.SortOrder
 
 @Service
 class PostReadService(
@@ -21,36 +19,35 @@ class PostReadService(
     private val participantCountRepository: ParticipantCountRepository,
 ) {
     fun getPost(postUUId: String): GetPostResponseDto {
-        val postEntity = postRepository.findByUuid(postUUId)
+        val post = postRepository.findByUuid(postUUId)
             ?: throw NotFoundException("게시글을 찾을 수 없습니다. ($postUUId)")
 
-        val participantCount = participantCountRepository.getPostCountById(postEntity.id!!)
-        val pollIdToParticipantCount = participantCountRepository.getPollIdToCountMap(postEntity.polls.map { it.id!! })
+        val participantCount = participantCountRepository.getPostCountById(post.id)
+        val pollIdToParticipantCount = participantCountRepository.getPollIdToCountMap(post.polls.map { it.id!! })
 
         return GetPostResponseDto(
-            id = postEntity.uuid,
-            title = postEntity.title,
-            imageUrl = postEntity.imageKey?.let { objectManager.generateDownloadUrl(it) },
+            id = post.id.uuid,
+            title = post.title,
+            imageUrl = post.imageKey?.let { objectManager.generateDownloadUrl(it) },
             participantCount = participantCount,
-            polls = postEntity.polls.map { it.toDto(pollIdToParticipantCount[it.id]!!) },
-            createdAt = postEntity.createdAt,
-            updatedAt = postEntity.updatedAt
+            polls = post.polls.map { it.toDto(pollIdToParticipantCount[it.id]!!) },
+            createdAt = post.createdAt,
+            updatedAt = post.updatedAt
         )
     }
 
 
     fun getPosts(query: GetPostsQuery): GetPostsResponseDto {
-        val sort = idSortOrderToSort(query.sortOrder)
-        val pageable = PageRequest.of(0, PAGE_SIZE, sort)
-
-        val cursor = query.cursor?.toLong() ?: if (query.sortOrder == SortOrder.DESCENDING) Long.MAX_VALUE else 0
-        val posts = if (query.sortOrder == SortOrder.DESCENDING) {
-            postRepository.findAllByIdSmallerThanCursor(cursor, query.userId, pageable)
-        } else {
-            postRepository.findAllByIdBiggerThanCursor(cursor, query.userId, pageable)
-        }
-
-        val postIdToParticipantCount = participantCountRepository.getPostIdToCountMap(posts.map { it.id!! })
+        val posts = postRepository.findAllByQuery(
+            PostQuery(
+                userId = query.userId,
+                cursor = query.cursor,
+                sortBy = query.sortBy,
+                sortOrder = query.sortOrder,
+                pageSize = PAGE_SIZE,
+            )
+        )
+        val postIdToParticipantCount = participantCountRepository.getPostIdToCountMap(posts.map { it.id })
 
         return GetPostsResponseDto(
             posts = posts.map {
@@ -69,28 +66,22 @@ class PostReadService(
         val post = postRepository.findByUuid(query.postUuid)
             ?: throw NotFoundException("게시글을 찾을 수 없습니다. ($query.postUuid)")
 
-        val sort = idSortOrderToSort(query.sortOrder)
-        val pageable = PageRequest.of(0, PAGE_SIZE, sort)
-        val prevPost = if (query.sortOrder == SortOrder.DESCENDING) {
-            postRepository.findAllByIdSmallerThanCursor(post.id!!, query.userId, pageable)
-        } else {
-            postRepository.findAllByIdBiggerThanCursor(post.id!!, query.userId, pageable)
-        }
+        val prevPosts = postRepository.findAllByQuery(
+            PostQuery(
+                userId = query.userId,
+                sortBy = query.sortBy,
+                sortOrder = query.sortOrder,
+                pageSize = PAGE_SIZE,
+                postId = post.id.incrementId,
+            )
+        )
 
         return GetPrevPostResponseDto(
-            unReadPostIds = prevPost.map { it.uuid }
+            unReadPostIds = prevPosts.map { it.id.uuid }
         )
     }
 
-    private fun idSortOrderToSort(sortOrder: SortOrder): Sort {
-        return when (sortOrder) {
-            SortOrder.ASCENDING -> Sort.by(Sort.Order.asc("id"))
-            SortOrder.DESCENDING -> Sort.by(Sort.Order.desc("id"))
-            else -> Sort.unsorted()
-        }
-    }
-
-    private fun PollEntity.toDto(participantCount: Int): PollResponseDto {
+    private fun Poll.toDto(participantCount: Int): PollResponseDto {
         return PollResponseDto(
             id = this.id!!,
             title = this.title,
@@ -98,9 +89,9 @@ class PostReadService(
         )
     }
 
-    private fun PostEntity.toDto(participantCount: Int, imageUrl: String?): GetPostsResponseDtoPost {
+    private fun Post.toDto(participantCount: Int, imageUrl: String?): GetPostsResponseDtoPost {
         return GetPostsResponseDtoPost(
-            id = this.uuid,
+            id = this.id.uuid,
             title = this.title,
             imageUrl = imageUrl,
             participantCount = participantCount,

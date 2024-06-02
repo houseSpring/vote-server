@@ -41,7 +41,7 @@ class PostController(
     ): ResponseEntity<CreatePostResponseDto> {
         val command = dto.toCommand(userDetails.username.toLong())
         val result = this.postWriteService.create(command)
-        return ResponseEntity.status(HttpStatus.CREATED).body(CreatePostResponseDto(result))
+        return ResponseEntity.status(HttpStatus.CREATED).body(CreatePostResponseDto(result.id.uuid))
     }
 
     @SecureEndPoint

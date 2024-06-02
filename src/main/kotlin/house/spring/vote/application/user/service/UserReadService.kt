@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 class UserReadService(private val userRepository: UserRepository) {
     fun getUserInfoById(userId: Long): GetUserInfoResponseDto {
         val user = userRepository.findById(userId)
-            .orElseThrow { NotFoundException("${ErrorCode.USER_NOT_FOUND} (${userId})") }
+            ?: throw NotFoundException("${ErrorCode.USER_NOT_FOUND} (${userId})")
         return GetUserInfoResponseDto(user.id!!, user.nickname)
     }
 }

@@ -21,7 +21,7 @@ class CustomUserDetailsService(
 
     override fun loadUserByUsername(username: String?): UserDetails {
         val user = userRepository.findById(username!!.toLong())
-            .orElseThrow { UsernameNotFoundException("User not found with id: $username") }
+            ?: throw UsernameNotFoundException("User not found with id: $username")
         return User(user.id.toString(), "", generateDefaultAuthorities())
     }
 
