@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.serivce
+package house.spring.vote.infrastructure.post.serivce
 
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client

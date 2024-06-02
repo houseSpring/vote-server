@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.entity
+package house.spring.vote.infrastructure.user.entity
 
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate

@@ -1,9 +1,9 @@
 package house.spring.vote.application.user.service
 
 import house.spring.vote.application.user.dto.command.DeviceJoinCommand
-import house.spring.vote.domain.user.repository.UserRepository
 import house.spring.vote.domain.user.factory.UserFactory
 import house.spring.vote.domain.user.model.User
+import house.spring.vote.domain.user.repository.UserRepository
 import house.spring.vote.domain.validation.ValidationResult
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

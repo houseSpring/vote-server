@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.serivce
+package house.spring.vote.infrastructure.post.serivce
 
 import house.spring.vote.domain.post.service.ObjectKeyGenerator
 import house.spring.vote.util.HashUtil

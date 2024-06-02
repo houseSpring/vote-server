@@ -16,7 +16,7 @@ import house.spring.vote.domain.post.repository.PostRepository
 import house.spring.vote.domain.post.service.ObjectKeyGenerator
 import house.spring.vote.domain.post.service.ObjectManager
 import house.spring.vote.domain.validation.ValidationResult
-import house.spring.vote.infrastructure.entity.PostEntity
+import house.spring.vote.infrastructure.post.entity.PostEntity
 import house.spring.vote.interfaces.controller.post.response.CreatePickResponseDto
 import house.spring.vote.interfaces.controller.post.response.GenerateImageUploadUrlResponseDto
 import house.spring.vote.util.excaption.ErrorCode

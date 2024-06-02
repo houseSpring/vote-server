@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.security
+package house.spring.vote.infrastructure.common
 
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component

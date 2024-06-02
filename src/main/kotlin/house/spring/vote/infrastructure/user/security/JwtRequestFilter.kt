@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.security
+package house.spring.vote.infrastructure.user.security
 
 import house.spring.vote.domain.post.service.TokenProvider
 import jakarta.servlet.FilterChain

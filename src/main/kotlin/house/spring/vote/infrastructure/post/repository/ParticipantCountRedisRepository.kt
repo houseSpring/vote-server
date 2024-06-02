@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.repository
+package house.spring.vote.infrastructure.post.repository
 
 import house.spring.vote.domain.post.repository.ParticipantCountRepository
 import house.spring.vote.domain.post.service.CountKeyGenerator

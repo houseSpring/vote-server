@@ -1,6 +1,6 @@
 package house.spring.vote.config
 
-import house.spring.vote.infrastructure.security.JwtRequestFilter
+import house.spring.vote.infrastructure.user.security.JwtRequestFilter
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.security.SecurityRequirement

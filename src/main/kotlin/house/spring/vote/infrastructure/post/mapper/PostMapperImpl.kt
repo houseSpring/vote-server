@@ -1,10 +1,10 @@
-package house.spring.vote.infrastructure.mapper
+package house.spring.vote.infrastructure.post.mapper
 
 import house.spring.vote.application.post.port.PollMapper
 import house.spring.vote.application.post.port.PostMapper
 import house.spring.vote.domain.post.model.Post
 import house.spring.vote.domain.post.model.PostId
-import house.spring.vote.infrastructure.entity.PostEntity
+import house.spring.vote.infrastructure.post.entity.PostEntity
 import org.springframework.stereotype.Component
 
 @Component

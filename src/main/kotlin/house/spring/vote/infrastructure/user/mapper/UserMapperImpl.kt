@@ -1,8 +1,8 @@
-package house.spring.vote.infrastructure.mapper
+package house.spring.vote.infrastructure.user.mapper
 
 import house.spring.vote.application.user.port.UserMapper
 import house.spring.vote.domain.user.model.User
-import house.spring.vote.infrastructure.entity.UserEntity
+import house.spring.vote.infrastructure.user.entity.UserEntity
 import org.springframework.stereotype.Component
 
 @Component

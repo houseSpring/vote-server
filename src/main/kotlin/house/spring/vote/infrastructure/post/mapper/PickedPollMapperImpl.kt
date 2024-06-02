@@ -1,8 +1,8 @@
-package house.spring.vote.infrastructure.mapper
+package house.spring.vote.infrastructure.post.mapper
 
 import house.spring.vote.application.post.port.PickedPollMapper
 import house.spring.vote.domain.post.model.PickedPoll
-import house.spring.vote.infrastructure.entity.PickedPollEntity
+import house.spring.vote.infrastructure.post.entity.PickedPollEntity
 import org.springframework.stereotype.Component
 
 @Component

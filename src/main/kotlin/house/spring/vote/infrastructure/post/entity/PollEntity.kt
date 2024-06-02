@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.entity
+package house.spring.vote.infrastructure.post.entity
 
 import jakarta.persistence.*
 

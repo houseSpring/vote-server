@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.serivce
+package house.spring.vote.infrastructure.user.service
 
 import house.spring.vote.domain.post.service.TokenProvider
 import io.jsonwebtoken.Claims

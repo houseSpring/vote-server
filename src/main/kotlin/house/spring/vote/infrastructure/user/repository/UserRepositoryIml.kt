@@ -1,4 +1,4 @@
-package house.spring.vote.infrastructure.repository
+package house.spring.vote.infrastructure.user.repository
 
 import house.spring.vote.application.user.port.UserMapper
 import house.spring.vote.domain.user.model.User

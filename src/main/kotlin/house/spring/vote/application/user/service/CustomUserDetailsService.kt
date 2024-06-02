@@ -1,7 +1,7 @@
 package house.spring.vote.application.user.service
 
-import house.spring.vote.domain.user.repository.UserRepository
 import house.spring.vote.domain.user.model.Role
+import house.spring.vote.domain.user.repository.UserRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails

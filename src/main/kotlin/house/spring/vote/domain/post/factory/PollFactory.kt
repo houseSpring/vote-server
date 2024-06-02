@@ -1,7 +1,7 @@
 package house.spring.vote.domain.post.factory
 
 import house.spring.vote.domain.post.model.Poll
-import house.spring.vote.infrastructure.entity.PollEntity
+import house.spring.vote.infrastructure.post.entity.PollEntity
 import org.springframework.stereotype.Component
 
 @Component

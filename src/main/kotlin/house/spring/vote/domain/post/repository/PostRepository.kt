@@ -1,6 +1,6 @@
 package house.spring.vote.domain.post.repository
 
-import house.spring.vote.infrastructure.entity.PostEntity
+import house.spring.vote.infrastructure.post.entity.PostEntity
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query

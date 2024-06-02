@@ -1,7 +1,7 @@
 package house.spring.vote.application.post.port
 
 import house.spring.vote.domain.post.model.PickedPoll
-import house.spring.vote.infrastructure.entity.PickedPollEntity
+import house.spring.vote.infrastructure.post.entity.PickedPollEntity
 
 interface PickedPollMapper {
     fun toEntity(domain: PickedPoll): PickedPollEntity
