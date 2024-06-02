@@ -1,7 +1,6 @@
 package house.spring.vote.application.user.service
 
 import house.spring.vote.application.user.dto.command.AuthenticationCommand
-import house.spring.vote.application.user.port.UserMapper
 import house.spring.vote.domain.user.repository.UserRepository
 import house.spring.vote.util.excaption.ErrorCode
 import house.spring.vote.util.excaption.NotFoundException
@@ -16,7 +15,6 @@ interface AuthenticationStrategy {
 @Service("deviceIdAuthenticationStrategy")
 class DeviceIdAuthenticationStrategy(
     private val userRepository: UserRepository,
-    private val userMapper: UserMapper,
     private val customUserDetailsService: CustomUserDetailsService
 ) : AuthenticationStrategy {
     override fun authenticate(command: AuthenticationCommand): UserDetails {
@@ -24,7 +22,7 @@ class DeviceIdAuthenticationStrategy(
             .orElseThrow {
                 UnAuthorizedException("${ErrorCode.UNAUTHORIZED} (deviceId: ${command.deviceId})")
             }
-        return customUserDetailsService.createUserDetails(userMapper.toDomain(user))
+        return customUserDetailsService.createUserDetails(user)
     }
 }
 
@@ -32,7 +30,6 @@ class DeviceIdAuthenticationStrategy(
 @Service("emailPasswordAuthenticationStrategy")
 class EmailPasswordAuthenticationStrategy(
     private val userRepository: UserRepository,
-    private val userMapper: UserMapper,
     private val customUserDetailsService: CustomUserDetailsService
 ) : AuthenticationStrategy {
     override fun authenticate(command: AuthenticationCommand): UserDetails {
@@ -40,6 +37,6 @@ class EmailPasswordAuthenticationStrategy(
             .orElseThrow {
                 NotFoundException("${ErrorCode.USER_NOT_FOUND} (deviceId: ${command.deviceId})")
             }
-        return customUserDetailsService.createUserDetails(userMapper.toDomain(user))
+        return customUserDetailsService.createUserDetails(user)
     }
 }

@@ -1,9 +1,10 @@
 package house.spring.vote.domain.user.repository
 
-import house.spring.vote.infrastructure.entity.UserEntity
-import org.springframework.data.jpa.repository.JpaRepository
+import house.spring.vote.domain.user.model.User
 import java.util.*
 
-interface UserRepository : JpaRepository<UserEntity, Long> {
-    fun findByDeviceId(deviceId: String): Optional<UserEntity>
+interface UserRepository {
+    fun findById(id: Long): Optional<User>
+    fun findByDeviceId(deviceId: String): Optional<User>
+    fun save(user: User): User
 }
