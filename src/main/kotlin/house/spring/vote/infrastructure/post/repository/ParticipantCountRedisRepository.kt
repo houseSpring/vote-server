@@ -1,7 +1,7 @@
 package house.spring.vote.infrastructure.post.repository
 
 import house.spring.vote.domain.post.model.PostId
-import house.spring.vote.domain.post.repository.ParticipantCountRepository
+import house.spring.vote.application.post.repository.ParticipantCountRepository
 import house.spring.vote.domain.post.service.CountKeyGenerator
 import house.spring.vote.util.excaption.InternalServerException
 import org.springframework.data.redis.core.RedisTemplate

@@ -9,8 +9,8 @@ import house.spring.vote.domain.post.model.PickedPoll
 import house.spring.vote.domain.post.model.Poll
 import house.spring.vote.domain.post.model.Post
 import house.spring.vote.domain.post.model.PostId
-import house.spring.vote.domain.post.repository.PickedPollRepository
-import house.spring.vote.domain.post.repository.PostRepository
+import house.spring.vote.application.post.repository.PickedPollRepository
+import house.spring.vote.application.post.repository.PostRepository
 import house.spring.vote.domain.post.service.ObjectKeyGenerator
 import house.spring.vote.domain.post.service.ObjectManager
 import house.spring.vote.domain.validation.ValidationResult
@@ -81,7 +81,12 @@ class PostWriteService(
         val post = postRepository.findByUuid(command.postUUID)
             ?: throw NotFoundException("${ErrorCode.POST_NOT_FOUND} (${command.postUUID})")
 
-        val validateResult = post.validatePickedPoll(command.userId, command.pickedPollIds, pickedPollRepository)
+        val alreadyPicked = pickedPollRepository.existsByPostIdAndUserId(post.id.incrementId!!, command.userId)
+        if (alreadyPicked) {
+            throw InternalServerException("${ErrorCode.ALREADY_PICKED_POST} (${command.postUUID})")
+        }
+
+        val validateResult = post.validatePickedPoll(command.pickedPollIds)
         if (validateResult is ValidationResult.Error) {
             throw validateResult.exception
         }

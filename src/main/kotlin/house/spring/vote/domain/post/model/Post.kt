@@ -1,9 +1,7 @@
 package house.spring.vote.domain.post.model
 
-import house.spring.vote.domain.post.repository.PickedPollRepository
 import house.spring.vote.domain.validation.ValidationResult
 import house.spring.vote.util.excaption.BadRequestException
-import house.spring.vote.util.excaption.ConflictException
 import house.spring.vote.util.excaption.ErrorCode
 import house.spring.vote.util.excaption.NotFoundException
 import java.time.LocalDateTime
@@ -46,14 +44,10 @@ data class Post(
     }
 
     fun validatePickedPoll(
-        userId: Long,
         pickedPollIds: List<Long>,
-        pickedPollRepository: PickedPollRepository
     ): ValidationResult {
         return if (!isPickedPollsSizeValid(pickedPollIds.size)) {
             ValidationResult.Error(BadRequestException(ErrorCode.INVALID_PICKED_POLL_SIZE))
-        } else if (isAlreadyPicked(this.id.incrementId!!, userId, pickedPollRepository)) {
-            ValidationResult.Error(ConflictException("${ErrorCode.ALREADY_PICKED_POST} (${this.id.uuid})"))
         } else if (hasInvalidPollId(pickedPollIds)) {
             ValidationResult.Error(NotFoundException("${ErrorCode.POLL_NOT_FOUND} (${pickedPollIds.joinToString()})"))
         } else {
@@ -70,10 +64,6 @@ data class Post(
             PickType.Multi -> size >= 2
             PickType.Single -> size == 1
         }
-    }
-
-    private fun isAlreadyPicked(postId: Long, userId: Long, pickedPollJpaRepository: PickedPollRepository): Boolean {
-        return pickedPollJpaRepository.existsByPostIdAndUserId(postId, userId)
     }
 
     private fun hasInvalidPollId(pollIds: List<Long>): Boolean {

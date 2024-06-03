@@ -4,9 +4,9 @@ import house.spring.vote.application.post.dto.query.GetPostsQuery
 import house.spring.vote.application.post.dto.query.GetPrevPostIdQuery
 import house.spring.vote.domain.post.model.Poll
 import house.spring.vote.domain.post.model.Post
-import house.spring.vote.domain.post.repository.ParticipantCountRepository
-import house.spring.vote.domain.post.repository.PostQuery
-import house.spring.vote.domain.post.repository.PostRepository
+import house.spring.vote.application.post.repository.ParticipantCountRepository
+import house.spring.vote.application.post.repository.PostQuery
+import house.spring.vote.application.post.repository.PostRepository
 import house.spring.vote.domain.post.service.ObjectManager
 import house.spring.vote.interfaces.controller.post.response.*
 import house.spring.vote.util.excaption.NotFoundException

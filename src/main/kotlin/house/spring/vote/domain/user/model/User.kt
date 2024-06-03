@@ -1,6 +1,6 @@
 package house.spring.vote.domain.user.model
 
-import house.spring.vote.domain.user.repository.UserRepository
+import house.spring.vote.application.user.repository.UserRepository
 import house.spring.vote.domain.validation.ValidationResult
 import house.spring.vote.util.excaption.ConflictException
 import house.spring.vote.util.excaption.ErrorCode

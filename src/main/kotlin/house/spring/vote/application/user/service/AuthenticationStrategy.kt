@@ -1,7 +1,7 @@
 package house.spring.vote.application.user.service
 
 import house.spring.vote.application.user.dto.command.AuthenticationCommand
-import house.spring.vote.domain.user.repository.UserRepository
+import house.spring.vote.application.user.repository.UserRepository
 import house.spring.vote.util.excaption.ErrorCode
 import house.spring.vote.util.excaption.UnAuthorizedException
 import org.springframework.security.core.userdetails.UserDetails

@@ -1,6 +1,6 @@
 package house.spring.vote.application.user.service
 
-import house.spring.vote.domain.user.repository.UserRepository
+import house.spring.vote.application.user.repository.UserRepository
 import house.spring.vote.interfaces.controller.user.response.GetUserInfoResponseDto
 import house.spring.vote.util.excaption.ErrorCode
 import house.spring.vote.util.excaption.NotFoundException

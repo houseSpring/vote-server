@@ -1,4 +1,4 @@
-package house.spring.vote.domain.user.repository
+package house.spring.vote.application.user.repository
 
 import house.spring.vote.domain.user.model.User
 

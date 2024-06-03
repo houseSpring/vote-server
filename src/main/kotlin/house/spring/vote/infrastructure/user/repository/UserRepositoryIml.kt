@@ -2,7 +2,7 @@ package house.spring.vote.infrastructure.user.repository
 
 import house.spring.vote.application.user.port.UserMapper
 import house.spring.vote.domain.user.model.User
-import house.spring.vote.domain.user.repository.UserRepository
+import house.spring.vote.application.user.repository.UserRepository
 import org.springframework.stereotype.Repository
 
 @Repository

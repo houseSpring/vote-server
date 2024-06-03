@@ -2,7 +2,7 @@ package house.spring.vote.infrastructure.post.repository
 
 import house.spring.vote.application.post.port.PickedPollMapper
 import house.spring.vote.domain.post.model.PickedPoll
-import house.spring.vote.domain.post.repository.PickedPollRepository
+import house.spring.vote.application.post.repository.PickedPollRepository
 import org.springframework.stereotype.Repository
 
 @Repository

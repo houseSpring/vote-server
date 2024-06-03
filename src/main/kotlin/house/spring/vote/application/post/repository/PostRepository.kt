@@ -1,4 +1,4 @@
-package house.spring.vote.domain.post.repository
+package house.spring.vote.application.post.repository
 
 import house.spring.vote.domain.post.model.Post
 

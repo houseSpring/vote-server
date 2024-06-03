@@ -33,8 +33,6 @@ class AmazonS3ObjectManager(
         }
     }
 
-    private val PRESIGNED_URL_EXPIRATION = 10.minutes
-
     override fun generateDownloadUrl(objectKey: String): String {
         return "https://${bucket}.s3.${region}.amazonaws.com/$objectKey"
     }
@@ -73,4 +71,9 @@ class AmazonS3ObjectManager(
         }
         s3Client.deleteObject(deleteObjectRequest)
     }
+
+    companion object {
+        private val PRESIGNED_URL_EXPIRATION = 10.minutes
+    }
+
 }
