@@ -1,6 +1,6 @@
 package house.spring.vote.config
 
-import house.spring.vote.infrastructure.common.LoggingInterceptor
+import house.spring.vote.common.infrastructure.LoggingInterceptor
 import org.springframework.context.annotation.Configuration
 //import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
