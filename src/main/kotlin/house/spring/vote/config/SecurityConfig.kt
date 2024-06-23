@@ -53,12 +53,6 @@ class SecurityConfig(
         return http.build()
     }
 
-//    @Bean
-//    fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
-//        return http.csrf {
-//            it.disable()
-//        }.build()
-//    }
 
     @Bean
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager {

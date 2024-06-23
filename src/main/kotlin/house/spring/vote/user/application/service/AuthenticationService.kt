@@ -3,6 +3,8 @@ package house.spring.vote.user.application.service
 import house.spring.vote.common.domain.exception.ErrorCode
 import house.spring.vote.common.domain.exception.UnAuthorizedException
 import house.spring.vote.user.application.command.AuthenticationCommand
+import house.spring.vote.user.application.service.strategy.AuthenticationStrategy
+import house.spring.vote.user.application.service.strategy.AuthenticationStrategyType
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 
