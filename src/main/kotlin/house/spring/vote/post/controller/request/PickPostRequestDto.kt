@@ -4,5 +4,5 @@ import jakarta.validation.constraints.NotEmpty
 
 data class PickPostRequestDto(
     @field:NotEmpty(message = "선택한 투표가 없습니다.")
-    val pickedPollIds: List<String>
+    val pickedPollIds: List<String>,
 )

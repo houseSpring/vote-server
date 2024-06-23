@@ -6,17 +6,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class RedisKeyGenerator(
-    @Value("\${spring.redis.key-pick_poll-prefix}") private val pickPollPrefix: String,
-    @Value("\${spring.redis.key-pick_post-prefix}") private val pickPostPrefix: String
+    @Value("\${spring.redis.key-pick_post-prefix}") private val pickPostPrefix: String,
 ) : CountKeyGenerator {
-
-    override fun generatePickPollCountKey(pollId: String): String {
-        return "$pickPollPrefix:$pollId"
-    }
-
-    override fun generatePickPollCountKeys(pollIds: List<String>): List<String> {
-        return pollIds.map { generatePickPollCountKey(it) }
-    }
 
     override fun generatePickPostCountKey(postId: String): String {
         return "$pickPostPrefix:${postId}"

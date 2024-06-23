@@ -22,7 +22,7 @@ class AmazonS3ObjectManager(
     @Value("\${aws.s3.accessKeyId}")
     private val accessKeyId: String,
     @Value("\${aws.s3.secretAccessKey}")
-    private val secretAccessKey: String
+    private val secretAccessKey: String,
 ) : ObjectManager {
 
     private val s3Client: S3Client = S3Client {

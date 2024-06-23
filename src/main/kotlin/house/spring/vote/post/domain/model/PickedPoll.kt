@@ -10,7 +10,8 @@ data class PickedPoll(
 ) {
     companion object {
         fun create(postId: String, pollId: String, userId: String): PickedPoll {
-            val pickedPoll =  PickedPoll(id = UUID.randomUUID().toString(), postId = postId, pollId = pollId, userId = userId)
+            val pickedPoll =
+                PickedPoll(id = UUID.randomUUID().toString(), postId = postId, pollId = pollId, userId = userId)
             return pickedPoll
         }
     }

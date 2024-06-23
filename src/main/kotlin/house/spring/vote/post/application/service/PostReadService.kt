@@ -26,15 +26,14 @@ class PostReadService(
         val post = postRepository.findEntityById(postId)
             ?: throw PostNotFoundException(" (postId: $postId)")
 
-        val participantCount = participantCountRepository.getPostCountById(post.id)
-        val pollIdToParticipantCount = participantCountRepository.getPollIdToCountMap(post.polls.map { it.id })
+        val idToCount = participantCountRepository.getPostCount(postId)
 
         return GetPostResponseDto(
             id = post.id,
             title = post.title,
             imageUrl = post.imageKey?.let { objectManager.generateDownloadUrl(it) },
-            participantCount = participantCount,
-            polls = post.polls.map { it.toDto(pollIdToParticipantCount[it.id]!!) },
+            participantCount = idToCount[postId]!!,
+            polls = post.polls.map { it.toDto(idToCount[it.id]!!) },
             createdAt = post.createdAt,
             updatedAt = post.updatedAt
         )
@@ -51,12 +50,12 @@ class PostReadService(
                 pageSize = PAGE_SIZE,
             )
         )
-        val postIdToParticipantCount = participantCountRepository.getPostIdToCountMap(posts.map { it.id })
+        val postIdToCount = participantCountRepository.getPostsCount(posts.map { it.id })
 
         return GetPostsResponseDto(
             posts = posts.map {
                 it.toDto(
-                    postIdToParticipantCount[it.id]!!,
+                    postIdToCount[it.id]!!,
                     it.imageKey?.let { imageKey -> objectManager.generateDownloadUrl(imageKey) }
                 )
             },

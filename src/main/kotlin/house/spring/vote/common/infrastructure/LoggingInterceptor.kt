@@ -21,7 +21,7 @@ class LoggingInterceptor : HandlerInterceptor {
         request: HttpServletRequest,
         response: HttpServletResponse,
         handler: Any,
-        ex: Exception?
+        ex: Exception?,
     ) {
         val startTime = request.getAttribute("startTime") as Long
         val endTime = System.currentTimeMillis()

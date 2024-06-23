@@ -24,5 +24,5 @@ data class GetPostsRequestDto(
         description = "정렬 순서",
         required = false,
         defaultValue = "DESCENDING",
-    ) val sortOrder: SortOrder = SortOrder.DESCENDING
+    ) val sortOrder: SortOrder = SortOrder.DESCENDING,
 )

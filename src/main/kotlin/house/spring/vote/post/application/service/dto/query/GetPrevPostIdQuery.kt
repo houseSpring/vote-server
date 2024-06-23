@@ -7,5 +7,5 @@ data class GetPrevPostIdQuery(
     val userId: String,
     val postId: String,
     val sortBy: SortBy,
-    val sortOrder: SortOrder
+    val sortOrder: SortOrder,
 )

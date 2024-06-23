@@ -1,9 +1,9 @@
 package house.spring.vote.user.application.service
 
-import house.spring.vote.user.application.repository.UserRepository
-import house.spring.vote.user.controller.response.GetUserInfoResponseDto
 import house.spring.vote.common.domain.exception.ErrorCode
 import house.spring.vote.common.domain.exception.not_found.NotFoundException
+import house.spring.vote.user.application.repository.UserRepository
+import house.spring.vote.user.controller.response.GetUserInfoResponseDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

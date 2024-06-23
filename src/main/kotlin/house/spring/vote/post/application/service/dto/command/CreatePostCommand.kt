@@ -11,5 +11,5 @@ data class CreatePostCommand(
 )
 
 data class CreatePostCommandPoll(
-    val title: String
+    val title: String,
 )

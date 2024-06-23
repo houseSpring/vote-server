@@ -8,5 +8,5 @@ data class GetPrevPostRequestDto(
     @Schema(allowableValues = ["CREATED_AT"])
     val sortBy: SortBy = SortBy.CREATED_AT,
     @Schema(allowableValues = ["DESCENDING", "ASCENDING"])
-    val sortOrder: SortOrder = SortOrder.DESCENDING
+    val sortOrder: SortOrder = SortOrder.DESCENDING,
 )
