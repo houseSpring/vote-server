@@ -1,24 +1,20 @@
 package house.spring.vote.post.application.service
 
+import house.spring.vote.common.domain.exception.ErrorCode
+import house.spring.vote.common.domain.exception.internal_server.CopyImageFailException
+import house.spring.vote.common.domain.exception.internal_server.InternalServerException
+import house.spring.vote.common.domain.exception.not_found.NotFoundException
+import house.spring.vote.post.application.port.ObjectKeyGenerator
+import house.spring.vote.post.application.port.ObjectManager
+import house.spring.vote.post.application.port.repository.PickedPollRepository
+import house.spring.vote.post.application.port.repository.PostRepository
 import house.spring.vote.post.application.service.dto.command.CreatePostCommand
 import house.spring.vote.post.application.service.dto.command.GenerateImageUploadUrlCommand
 import house.spring.vote.post.application.service.dto.command.PickPostCommand
-import house.spring.vote.common.application.EventPublisher
-import house.spring.vote.post.domain.event.PickedPollEvent
-import house.spring.vote.post.domain.model.PickedPoll
-import house.spring.vote.post.domain.model.Poll
-import house.spring.vote.post.domain.model.Post
-import house.spring.vote.post.domain.model.PostId
-import house.spring.vote.post.application.port.repository.PickedPollRepository
-import house.spring.vote.post.application.port.repository.PostRepository
-import house.spring.vote.post.application.port.ObjectKeyGenerator
-import house.spring.vote.post.application.port.ObjectManager
-import house.spring.vote.common.domain.validation.ValidationResult
 import house.spring.vote.post.controller.response.CreatePickResponseDto
 import house.spring.vote.post.controller.response.GenerateImageUploadUrlResponseDto
-import house.spring.vote.common.domain.exception.ErrorCode
-import house.spring.vote.common.domain.exception.InternalServerException
-import house.spring.vote.common.domain.exception.NotFoundException
+import house.spring.vote.post.domain.model.Poll
+import house.spring.vote.post.domain.model.Post
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -30,7 +26,6 @@ class PostWriteService(
     private val objectKeyGenerator: ObjectKeyGenerator,
     private val postRepository: PostRepository,
     private val pickedPollRepository: PickedPollRepository,
-    private val eventPublisher: EventPublisher,
 ) {
     suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): GenerateImageUploadUrlResponseDto {
         val imageKey = objectKeyGenerator.generateTempImageKey(command.userId)
@@ -38,9 +33,7 @@ class PostWriteService(
         return GenerateImageUploadUrlResponseDto(uploadUrl, imageKey)
     }
 
-    // TODO: 코루틴을 사용할때 transactional 어노테이션 주의 필요
-//    @Transactional
-    suspend fun create(command: CreatePostCommand): Post {
+    suspend fun create(command: CreatePostCommand): String {
         val post = Post.create(
             title = command.title,
             userId = command.userId,
@@ -48,16 +41,12 @@ class PostWriteService(
             imageKey = command.imageKey,
             polls = command.polls.map { Poll.create(it.title) })
 
-        val validateResult = post.validateForCreation()
-        if (validateResult is ValidationResult.Error) {
-            throw validateResult.exception
-        }
-
         if (post.hasImage()) {
-            post.imageKey = processImage(post.id.uuid, post.imageKey!!)
+            val imageKey = processImage(post.id, post.imageKey!!)
+            return savePost(post.addImageKey(imageKey)).id
         }
 
-        return savePost(post)
+        return savePost(post).id
     }
 
     private suspend fun savePost(post: Post): Post = withContext(Dispatchers.IO) {
@@ -71,39 +60,27 @@ class PostWriteService(
                 objectManager.copyObject(sourceKey, destinationKey)
             }
         } catch (e: Exception) {
-            throw InternalServerException("${ErrorCode.FAIL_ON_COPY_IMAGE} ($sourceKey -> $destinationKey)")
+            throw CopyImageFailException()
         }
         return destinationKey
     }
 
     @Transactional
     fun pickPost(command: PickPostCommand): CreatePickResponseDto {
-        val post = postRepository.findByUuid(command.postUUID)
-            ?: throw NotFoundException("${ErrorCode.POST_NOT_FOUND} (${command.postUUID})")
+        val post = postRepository.findById(command.postId)
+            ?: throw NotFoundException("${ErrorCode.POST_NOT_FOUND} (${command.postId})")
 
-        val alreadyPicked = pickedPollRepository.existsByPostIdAndUserId(post.id.incrementId!!, command.userId)
+        val alreadyPicked = pickedPollRepository.existsByPostIdAndUserId(post.id, command.userId)
         if (alreadyPicked) {
-            throw InternalServerException("${ErrorCode.ALREADY_PICKED_POST} (${command.postUUID})")
+            throw InternalServerException("${ErrorCode.ALREADY_PICKED_POST} (${command.postId})")
         }
 
-        val validateResult = post.validatePickedPoll(command.pickedPollIds)
-        if (validateResult is ValidationResult.Error) {
-            throw validateResult.exception
-        }
-
-        val pickedPolls = command.pickedPollIds.map {
-            PickedPoll.create(post.id, it, command.userId)
-        }
+        val pickedPolls = post.createPickedPolls(command.pickedPollIds)
         pickedPollRepository.saveAll(pickedPolls)
 
-        publishPickedPollEvent(post.id, command.pickedPollIds)
         return CreatePickResponseDto(
-            command.postUUID, command.pickedPollIds
+            command.postId, command.pickedPollIds
         )
     }
 
-    private fun publishPickedPollEvent(postId: PostId, pickedPollIds: List<Long>) {
-        val event = PickedPollEvent(this, postId, pickedPollIds)
-        eventPublisher.publishEvent(event)
-    }
 }

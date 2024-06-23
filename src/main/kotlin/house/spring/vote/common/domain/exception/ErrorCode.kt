@@ -1,6 +1,7 @@
 package house.spring.vote.common.domain.exception
 
 object ErrorCode {
+    const val INVALID_ARGUMENT = "유효하지 않은 인자입니다."
     const val INVALID_POLL_SIZE = "투표 항목 갯수가 올바르지 않습니다."
     const val INVALID_PICKED_POLL_SIZE = "투표 항목 갯수가 올바르지 않습니다."
 

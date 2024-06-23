@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class UserMapperImpl : UserMapper {
     override fun toDomain(entity: UserEntity): User {
         return User(
-            id = entity.id!!,
+            id = entity.id,
             nickname = entity.nickname,
             deviceId = entity.deviceId
         )

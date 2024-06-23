@@ -1,62 +1,55 @@
 package house.spring.vote.post.domain.model
 
-import house.spring.vote.common.domain.validation.ValidationResult
-import house.spring.vote.common.domain.exception.BadRequestException
 import house.spring.vote.common.domain.exception.ErrorCode
-import house.spring.vote.common.domain.exception.NotFoundException
-import java.time.LocalDateTime
+import house.spring.vote.common.domain.exception.bad_request.InvalidPickedPollSizeException
+import house.spring.vote.common.domain.exception.not_found.PickedPollNotFoundException
+import house.spring.vote.post.domain.event.PickedPollEvent
+import java.util.*
 
-// TODO: VO 검증 로직 추가
 data class Post(
-    val id: PostId = PostId(),
+    val id: String,
     val title: String,
-    val userId: Long,
+    val userId: String,
     val pickType: PickType,
-    var imageKey: String? = null,
+    val imageKey: String? = null,
     val polls: List<Poll> = mutableListOf(),
-    val createdAt: LocalDateTime = LocalDateTime.now(),
 ) {
 
-    var updatedAt: LocalDateTime = LocalDateTime.now()
-        private set
-
-    constructor(
-        id: PostId,
-        title: String,
-        userId: Long,
-        pickType: PickType,
-        imageKey: String?,
-        polls: List<Poll>,
-        updatedAt: LocalDateTime,
-        createdAt: LocalDateTime
-    ) : this(id, title, userId, pickType, imageKey, polls, createdAt) {
-        this.updatedAt = updatedAt
+    init {
+        require(UUID.fromString(id) != null) { ErrorCode.INVALID_ARGUMENT + " (id: $id)" }
+        require(title.isNotBlank()) { ErrorCode.INVALID_ARGUMENT + " (title: $title)" }
+        require(polls.size in POLL_MIN_SIZE..POLL_MAX_SIZE) { ErrorCode.INVALID_POLL_SIZE + " (polls: ${polls.size})" }
     }
+
+    val events = mutableListOf<Any>()
 
     fun hasImage(): Boolean = imageKey != null
 
-    fun validateForCreation(): ValidationResult {
-        return if (!this.isPollsSizeValid()) {
-            ValidationResult.Error(BadRequestException(ErrorCode.INVALID_POLL_SIZE))
-        } else {
-            ValidationResult.Success
-        }
+    fun createPickedPolls(pickedPollIds: List<String>): List<PickedPoll> {
+        validatePickedPoll(pickedPollIds)
+        events.add(PickedPollEvent(this, id, pickedPollIds))
+        return pickedPollIds.map { PickedPoll.create(id, it, userId) }
     }
 
-    fun validatePickedPoll(
-        pickedPollIds: List<Long>,
-    ): ValidationResult {
-        return if (!isPickedPollsSizeValid(pickedPollIds.size)) {
-            ValidationResult.Error(BadRequestException(ErrorCode.INVALID_PICKED_POLL_SIZE))
-        } else if (hasInvalidPollId(pickedPollIds)) {
-            ValidationResult.Error(NotFoundException("${ErrorCode.POLL_NOT_FOUND} (${pickedPollIds.joinToString()})"))
-        } else {
-            ValidationResult.Success
-        }
+
+    fun addImageKey(imageKey: String): Post {
+        return this.copy(imageKey = imageKey)
     }
 
-    private fun isPollsSizeValid(): Boolean {
-        return polls.size in (POLL_MIN_SIZE + 1)..<POLL_MAX_SIZE
+    fun addEvents(events: List<Any>) {
+        this.events.addAll(events)
+    }
+
+    private fun validatePickedPoll(
+        pickedPollIds: List<String>,
+    ) {
+        if (isPickedPollsSizeValid(pickedPollIds.size)) {
+            throw InvalidPickedPollSizeException("(pickedPollIds: ${pickedPollIds.joinToString()}")
+        }
+
+        if (hasInvalidPollId(pickedPollIds)) {
+            throw PickedPollNotFoundException("(${pickedPollIds.joinToString()})")
+        }
     }
 
     private fun isPickedPollsSizeValid(size: Int): Boolean {
@@ -66,20 +59,20 @@ data class Post(
         }
     }
 
-    private fun hasInvalidPollId(pollIds: List<Long>): Boolean {
+    private fun hasInvalidPollId(pollIds: List<String>): Boolean {
         return pollIds.any { !this.hasPollId(it) }
     }
 
-    private fun hasPollId(pollId: Long): Boolean = polls.any { it.id == pollId }
+    private fun hasPollId(pollId: String): Boolean = polls.any { it.id == pollId }
 
     companion object {
         const val POLL_MAX_SIZE = 10
         const val POLL_MIN_SIZE = 2
 
         fun create(
-            id: PostId = PostId(),
+            id: String = UUID.randomUUID().toString(),
             title: String,
-            userId: Long,
+            userId: String,
             pickType: PickType,
             imageKey: String? = null,
             polls: List<Poll> = mutableListOf(),

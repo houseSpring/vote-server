@@ -10,7 +10,7 @@ class PickedPollRepositoryImpl(
     private val pickedPollJpaRepository: PickedPollJpaRepository,
     private val pickedPollMapper: PickedPollMapper
 ) : PickedPollRepository {
-    override fun existsByPostIdAndUserId(postId: Long, userId: Long): Boolean {
+    override fun existsByPostIdAndUserId(postId: String, userId: String): Boolean {
         return pickedPollJpaRepository.existsByPostIdAndUserId(postId, userId)
     }
 

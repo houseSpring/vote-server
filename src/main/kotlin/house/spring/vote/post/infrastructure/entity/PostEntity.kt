@@ -5,29 +5,28 @@ import jakarta.persistence.*
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.domain.AbstractAggregateRoot
+import org.springframework.data.domain.AfterDomainEventPublication
+import org.springframework.data.domain.DomainEvents
 import java.time.LocalDateTime
 
 @Entity
 @Table(
     name = "post", indexes = [
-        Index(name = "idx_post_uuid", columnList = "uuid", unique = true),
         Index(name = "idx_post_cursor", columnList = "createdAt")
     ]
 )
 @DynamicUpdate
 class PostEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
-    @Column(nullable = false, unique = true)
-    val uuid: String,
+    val id: String,
     @Column(nullable = false)
     val title: String,
     @Column(nullable = false)
-    val userId: Long,
+    val userId: String,
     @Column(nullable = false)
     val pickType: PickType,
-    @Column()
+    @Column(nullable = true)
     var imageKey: String? = null,
     @OneToMany(
         mappedBy = "post",
@@ -35,8 +34,8 @@ class PostEntity(
         orphanRemoval = true,
         fetch = FetchType.LAZY
     )
-    val polls: MutableList<PollEntity> = mutableListOf()
-) {
+    val polls: MutableList<PollEntity> = mutableListOf(),
+) : AbstractAggregateRoot<PostEntity>() {
 
     @CreatedDate
     val createdAt: LocalDateTime = LocalDateTime.now()
@@ -47,8 +46,22 @@ class PostEntity(
     @Column(nullable = true)
     val deletedAt: LocalDateTime? = null
 
+    @DomainEvents
+    override fun domainEvents(): Collection<Any> {
+        return super.domainEvents()
+    }
+
+    @AfterDomainEventPublication
+    override fun clearDomainEvents() {
+        super.clearDomainEvents()
+    }
+
     fun addPoll(poll: PollEntity) {
-        poll.add(poll)
+        polls.add(poll)
         poll.post = this
+    }
+
+    fun addEvents(events: List<Any>) {
+        registerEvent(events)
     }
 }

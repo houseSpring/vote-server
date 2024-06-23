@@ -13,26 +13,25 @@ data class CreatePostRequestDto(
     val title: String,
     val pickType: PickType,
     @field:NotEmpty(message = "polls는 비어있을 수 없습니다.")
-    val polls: List<CreatePostRequestDtoPoll>,
+    val polls: List<PollDto>,
     @Schema(
         description = "upload시 발급받은 이미지 키",
         required = false
     )
-    val imageKey: String? = null
-)
-
-data class CreatePostRequestDtoPoll(
-    @field:NotBlank(message = "title은 공백일 수 없습니다.")
-    val title: String,
-)
-
-
-fun CreatePostRequestDto.toCommand(userId: Long): CreatePostCommand {
-    return CreatePostCommand(
-        title = title,
-        userId = userId,
-        pickType = pickType,
-        polls = polls.map { CreatePostCommandPoll(it.title) },
-        imageKey = imageKey
+    val imageKey: String? = null,
+) {
+    data class PollDto(
+        @field:NotBlank(message = "title은 공백일 수 없습니다.")
+        val title: String,
     )
+
+    fun toCommand(userId: String): CreatePostCommand {
+        return CreatePostCommand(
+            title = title,
+            userId = userId,
+            pickType = pickType,
+            polls = polls.map { CreatePostCommandPoll(it.title) },
+            imageKey = imageKey
+        )
+    }
 }

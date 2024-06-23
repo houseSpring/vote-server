@@ -4,5 +4,5 @@ import house.spring.vote.post.infrastructure.entity.PickedPollEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface PickedPollJpaRepository : JpaRepository<PickedPollEntity, Long> {
-    fun existsByPostIdAndUserId(postId: Long, userId: Long): Boolean
+    fun existsByPostIdAndUserId(postId: String, userId: String): Boolean
 }

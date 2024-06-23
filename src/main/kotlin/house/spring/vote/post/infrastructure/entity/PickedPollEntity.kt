@@ -1,6 +1,8 @@
 package house.spring.vote.post.infrastructure.entity
 
 import jakarta.persistence.*
+import org.springframework.data.annotation.CreatedDate
+import java.time.LocalDateTime
 
 @Entity()
 @Table(
@@ -11,14 +13,14 @@ import jakarta.persistence.*
 )
 class PickedPollEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: String,
     @Column(nullable = false)
-    val postId: Long,
+    val postId: String,
     @Column(nullable = false)
-    val pollId: Long,
+    val pollId: String,
     @Column(nullable = false)
-    val userId: Long
+    val userId: String,
 ) {
-
+    @CreatedDate
+    val createdAt: LocalDateTime = LocalDateTime.now()
 }

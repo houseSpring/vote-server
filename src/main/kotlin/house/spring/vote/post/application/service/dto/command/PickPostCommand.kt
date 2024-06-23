@@ -1,7 +1,7 @@
 package house.spring.vote.post.application.service.dto.command
 
 data class PickPostCommand(
-    val postUUID: String,
-    val userId: Long,
-    val pickedPollIds: List<Long>,
+    val postId: String,
+    val userId: String,
+    val pickedPollIds: List<String>,
 )

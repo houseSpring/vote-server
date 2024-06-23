@@ -9,8 +9,7 @@ import java.time.LocalDateTime
 @Table(name = "app_user", indexes = [Index(name = "idx_device_id", columnList = "deviceId")])
 class UserEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: String,
     @Column(nullable = false)
     var nickname: String,
     @Column(nullable = true)

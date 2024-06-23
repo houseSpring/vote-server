@@ -4,8 +4,8 @@ import house.spring.vote.post.domain.model.SortBy
 import javax.swing.SortOrder
 
 data class GetPostsQuery(
-    val userId: Long,
+    val userId: String,
     val cursor: String?,
     val sortBy: SortBy,
-    val sortOrder: SortOrder
+    val sortOrder: SortOrder,
 )

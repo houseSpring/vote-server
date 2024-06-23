@@ -5,14 +5,13 @@ import jakarta.persistence.*
 @Entity(name = "Poll")
 class PollEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: String,
     @Column(nullable = false)
     val title: String,
     @Column(nullable = false, insertable = false, updatable = false)
-    val postId: Long? = null
+    val postId: String,
 ) {
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "postId")
     var post: PostEntity? = null
 }

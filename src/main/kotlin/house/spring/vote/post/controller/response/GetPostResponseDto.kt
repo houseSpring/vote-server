@@ -10,10 +10,10 @@ data class GetPostResponseDto(
     val polls: List<PollResponseDto>,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
-)
-
-data class PollResponseDto(
-    val id: Long,
-    val title: String,
-    val participantCount: Int,
-)
+) {
+    data class PollResponseDto(
+        val id: String,
+        val title: String,
+        val participantCount: Int,
+    )
+}

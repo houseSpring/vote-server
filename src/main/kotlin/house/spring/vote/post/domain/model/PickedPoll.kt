@@ -1,14 +1,17 @@
 package house.spring.vote.post.domain.model
 
+import java.util.*
+
 data class PickedPoll(
-    val id: Long? = null,
-    val postId: Long,
-    val pollId: Long,
-    val userId: Long,
+    val id: String,
+    val postId: String,
+    val pollId: String,
+    val userId: String,
 ) {
     companion object {
-        fun create(postId: PostId, pollId: Long, userId: Long): PickedPoll {
-            return PickedPoll(postId = postId.incrementId!!, pollId = pollId, userId = userId)
+        fun create(postId: String, pollId: String, userId: String): PickedPoll {
+            val pickedPoll =  PickedPoll(id = UUID.randomUUID().toString(), postId = postId, pollId = pollId, userId = userId)
+            return pickedPoll
         }
     }
 }
