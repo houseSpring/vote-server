@@ -19,7 +19,7 @@ class PostMapperImpl(
             imageKey = domain.imageKey,
         )
         domain.polls.forEach { poll ->
-            entity.addPoll(pollMapper.toEntity(poll, domain.id))
+            entity.addPoll(pollMapper.toEntity(poll))
         }
         entity.addEvents(domain.events)
         return entity

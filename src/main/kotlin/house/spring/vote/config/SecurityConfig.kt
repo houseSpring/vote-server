@@ -40,18 +40,20 @@ class SecurityConfig(
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.csrf {
             it.disable()
+        }.cors {
+            it.disable()
         }.authorizeHttpRequests {
             it.requestMatchers(HttpMethod.POST, "/device-users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                .requestMatchers("/", "/error").permitAll()
+                .requestMatchers("/", "/health", "/error").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
         }.sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         }.addFilterBefore(jwtRequestFilter, BasicAuthenticationFilter::class.java)
-
         return http.build()
     }
+
 
 
     @Bean

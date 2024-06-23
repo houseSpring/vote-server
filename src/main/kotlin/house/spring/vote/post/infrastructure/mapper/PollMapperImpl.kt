@@ -7,11 +7,10 @@ import org.springframework.stereotype.Component
 
 @Component
 class PollMapperImpl : PollMapper {
-    override fun toEntity(domain: Poll, postId: String): PollEntity {
+    override fun toEntity(domain: Poll): PollEntity {
         return PollEntity(
             id = domain.id,
             title = domain.title,
-            postId = postId
         )
     }
 

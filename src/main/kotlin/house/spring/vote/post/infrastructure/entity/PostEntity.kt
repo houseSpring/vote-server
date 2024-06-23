@@ -32,7 +32,7 @@ class PostEntity(
         mappedBy = "post",
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
-        fetch = FetchType.LAZY
+        fetch = FetchType.EAGER
     )
     val polls: MutableList<PollEntity> = mutableListOf(),
 ) : AbstractAggregateRoot<PostEntity>() {
