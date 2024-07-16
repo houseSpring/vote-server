@@ -5,8 +5,6 @@ import house.spring.vote.post.application.port.repository.ParticipantCountReposi
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 
-// TODO: TTL 설정 추가 필요
-
 @Repository
 class RedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,

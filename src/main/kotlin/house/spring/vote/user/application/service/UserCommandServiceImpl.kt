@@ -2,18 +2,19 @@ package house.spring.vote.user.application.service
 
 import house.spring.vote.common.domain.exception.conflict.DeviceAlreadyRegisteredException
 import house.spring.vote.user.application.command.DeviceJoinCommand
+import house.spring.vote.user.application.port.`in`.UserCommandService
 import house.spring.vote.user.application.repository.UserRepository
 import house.spring.vote.user.domain.model.User
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class UserWriteService(
+class UserCommandServiceImpl(
     private val userRepository: UserRepository,
-) {
+) : UserCommandService {
 
     @Transactional
-    fun createDeviceUser(command: DeviceJoinCommand): String {
+    override fun createDeviceUser(command: DeviceJoinCommand): String {
         val alreadyExistUser = userRepository.findByDeviceId(command.deviceId)
         if (alreadyExistUser != null) {
             throw DeviceAlreadyRegisteredException("(deviceId: ${command.deviceId})")
