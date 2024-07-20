@@ -11,6 +11,10 @@ class RedisRepository(
     private val countKeyGenerator: CountKeyGenerator,
 ) : ParticipantCountRepository {
     override fun getPostsCount(postIds: List<String>): Map<String, Int> {
+        if (postIds.isEmpty()) {
+            return emptyMap()
+        }
+
         val postKeys = countKeyGenerator.generatePickPostCountKeys(postIds)
         val results = redisTemplate.executePipelined { session ->
             val hashCommands = session.hashCommands()
@@ -18,16 +22,20 @@ class RedisRepository(
                 val byteKey = postKey.toByteArray()
                 hashCommands.hGet(byteKey, byteKey)
             }
+            null
         }
 
-        return postKeys.zip(results).associate { (key, value) ->
-            key to ((value as String).toIntOrNull() ?: 0)
+        return postIds.zip(results).associate { (key, value) ->
+            key to ((value as String?)?.toIntOrNull() ?: 0)
         }
     }
 
     override fun getPostCount(postId: String): Map<String, Int> {
         val postKey = countKeyGenerator.generatePickPostCountKey(postId)
-        return redisTemplate.opsForHash<String, Int>().entries(postKey)
+        return redisTemplate.opsForHash<String, String?>()
+            .entries(postKey)
+            .mapKeys { countKeyGenerator.getId(it.key) }
+            .mapValues { it.value?.toIntOrNull() ?: 0 }
     }
 
     override fun countUpPickedPoll(postId: String, pollIds: List<String>) {
@@ -37,8 +45,13 @@ class RedisRepository(
             val postByteKey = postKey.toByteArray()
             hashCommands.hIncrBy(postByteKey, postByteKey, 1L)
             pollIds.forEach { pollId ->
-                hashCommands.hIncrBy(postByteKey, pollId.toByteArray(), 1L)
+                hashCommands.hIncrBy(
+                    postByteKey,
+                    countKeyGenerator.generatePickPollCountKey(postId, pollId).toByteArray(),
+                    1L
+                )
             }
+            null
         }
     }
 }

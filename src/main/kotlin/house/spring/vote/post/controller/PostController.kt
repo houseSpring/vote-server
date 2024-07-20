@@ -2,8 +2,8 @@ package house.spring.vote.post.controller
 
 import house.spring.vote.common.controller.annotation.CurrentUser
 import house.spring.vote.common.controller.annotation.SecureEndPoint
-import house.spring.vote.post.application.service.PostReadService
-import house.spring.vote.post.application.service.PostWriteService
+import house.spring.vote.post.application.service.PostQueryService
+import house.spring.vote.post.application.service.PostCommandService
 import house.spring.vote.post.application.service.dto.command.GenerateImageUploadUrlCommand
 import house.spring.vote.post.application.service.dto.command.PickPostCommand
 import house.spring.vote.post.application.service.dto.query.GetPostsQuery
@@ -19,7 +19,7 @@ import house.spring.vote.common.domain.CurrentUser as LoginUser
 
 @RestController
 class PostController(
-    private val postWriteService: PostWriteService, private val postReadService: PostReadService,
+    private val postCommandService: PostCommandService, private val postQueryService: PostQueryService,
 ) {
 
     @SecureEndPoint
@@ -27,9 +27,8 @@ class PostController(
     suspend fun generateImageUploadUrl(
         @CurrentUser user: LoginUser,
     ): ResponseEntity<GenerateImageUploadUrlResponseDto> {
-        println("user: $user")
         val command = GenerateImageUploadUrlCommand(user.id)
-        val result = this.postWriteService.createImageUploadUrl(command)
+        val result = this.postCommandService.createImageUploadUrl(command)
         return ResponseEntity.status(HttpStatus.CREATED).body(result)
     }
 
@@ -40,7 +39,7 @@ class PostController(
         @CurrentUser user: LoginUser,
     ): ResponseEntity<CreatePostResponseDto> {
         val command = dto.toCommand(user.id)
-        val createdId = this.postWriteService.create(command)
+        val createdId = this.postCommandService.create(command)
         return ResponseEntity.status(HttpStatus.CREATED).body(CreatePostResponseDto(createdId))
     }
 
@@ -52,7 +51,7 @@ class PostController(
         @CurrentUser user: LoginUser,
     ): ResponseEntity<CreatePickResponseDto> {
         val command = PickPostCommand(postId, user.id, dto.pickedPollIds)
-        val result = this.postWriteService.pickPost(command)
+        val result = this.postCommandService.pickPost(command)
         return ResponseEntity.status(HttpStatus.CREATED).body(result)
     }
 
@@ -64,16 +63,19 @@ class PostController(
         @CurrentUser user: LoginUser,
     ): ResponseEntity<GetPostsResponseDto> {
         val query = GetPostsQuery(
-            cursor = dto.cursor, sortBy = dto.sortBy, sortOrder = dto.sortOrder, userId = user.id,
+            offset = dto.offset,
+            sortBy = dto.sortBy,
+            sortOrder = dto.sortOrder,
+            userId = user.id,
         )
-        val result = postReadService.getPosts(query)
+        val result = postQueryService.getPosts(query)
         return ResponseEntity.ok(result)
     }
 
     @SecureEndPoint
     @GetMapping("/posts/{id}")
     fun getPost(@PathVariable id: String): ResponseEntity<GetPostResponseDto> {
-        val result = postReadService.getPost(id)
+        val result = postQueryService.getPost(id)
         return ResponseEntity.ok(result)
     }
 
@@ -87,7 +89,7 @@ class PostController(
         val query = GetPrevPostIdQuery(
             userId = user.id, postId = postId, sortBy = dto.sortBy, sortOrder = dto.sortOrder
         )
-        val result = postReadService.getPrevPostIds(query)
+        val result = postQueryService.getPrevPostIds(query)
         return ResponseEntity.ok(result)
     }
 }

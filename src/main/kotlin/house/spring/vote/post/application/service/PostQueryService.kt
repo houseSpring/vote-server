@@ -1,6 +1,5 @@
 package house.spring.vote.post.application.service
 
-import house.spring.vote.common.domain.exception.not_found.NotFoundException
 import house.spring.vote.common.domain.exception.not_found.PostNotFoundException
 import house.spring.vote.post.application.port.ObjectManager
 import house.spring.vote.post.application.port.repository.ParticipantCountRepository
@@ -16,7 +15,7 @@ import house.spring.vote.post.infrastructure.entity.PostEntity
 import org.springframework.stereotype.Service
 
 @Service
-class PostReadService(
+class PostQueryService(
     private val postRepository: PostRepository,
     private val objectManager: ObjectManager,
     private val participantCountRepository: ParticipantCountRepository,
@@ -26,13 +25,12 @@ class PostReadService(
             ?: throw PostNotFoundException(" (postId: $postId)")
 
         val idToCount = participantCountRepository.getPostCount(postId)
-
         return GetPostResponseDto(
             id = post.id,
             title = post.title,
             imageUrl = post.imageKey?.let { objectManager.generateDownloadUrl(it) },
-            participantCount = idToCount[postId]!!,
-            polls = post.polls.map { it.toDto(idToCount[it.id]!!) },
+            participantCount = idToCount[postId] ?: 0,
+            polls = post.polls.map { it.toDto(idToCount[it.id] ?: 0) },
             createdAt = post.createdAt,
             updatedAt = post.updatedAt
         )
@@ -40,37 +38,34 @@ class PostReadService(
 
 
     fun getPosts(query: GetPostsQuery): GetPostsResponseDto {
-        val posts = postRepository.findAllByQuery(
+        val page = postRepository.findAllByQuery(
             PostQuery(
                 userId = query.userId,
-                cursor = query.cursor,
+                offset = query.offset,
                 sortBy = query.sortBy,
                 sortOrder = query.sortOrder,
                 pageSize = PAGE_SIZE,
             )
         )
-        val postIdToCount = participantCountRepository.getPostsCount(posts.map { it.id })
-
+        val postIdToCount = participantCountRepository.getPostsCount(page.content.map { it.id })
         return GetPostsResponseDto(
-            posts = posts.map {
+            posts = page.content.map {
                 it.toDto(
                     postIdToCount[it.id]!!,
                     it.imageKey?.let { imageKey -> objectManager.generateDownloadUrl(imageKey) }
                 )
             },
-            cursor = posts.lastOrNull()?.id,
+            currentPage = page.number,
+            totalPages = page.totalPages,
             sortBy = query.sortBy,
             sortOrder = query.sortOrder
         )
     }
 
     fun getPrevPostIds(query: GetPrevPostIdQuery): GetPrevPostResponseDto {
-        val post = postRepository.findById(query.postId)
-            ?: throw NotFoundException("게시글을 찾을 수 없습니다. ($query.postUuid)")
-
-        val prevPosts = postRepository.findAllByQuery(
+        // TODO: 페이지네이션으로 변경으로 의도대로 동작하지 않음
+        val page = postRepository.findAllByQuery(
             PostQuery(
-                id = post.id,
                 userId = query.userId,
                 sortBy = query.sortBy,
                 sortOrder = query.sortOrder,
@@ -79,7 +74,7 @@ class PostReadService(
         )
 
         return GetPrevPostResponseDto(
-            unReadPostIds = prevPosts.map { it.id }
+            unReadPostIds = page.content.map { it.id }
         )
     }
 
@@ -91,10 +86,14 @@ class PostReadService(
         )
     }
 
-    private fun PostEntity.toDto(participantCount: Int, imageUrl: String?): GetPostsResponseDto.GetPostsResponseDtoPost {
+    private fun PostEntity.toDto(
+        participantCount: Int,
+        imageUrl: String?,
+    ): GetPostsResponseDto.GetPostsResponseDtoPost {
         return GetPostsResponseDto.GetPostsResponseDtoPost(
             id = this.id,
             title = this.title,
+            userId = this.userId,
             imageUrl = imageUrl,
             participantCount = participantCount,
             createdAt = this.createdAt,

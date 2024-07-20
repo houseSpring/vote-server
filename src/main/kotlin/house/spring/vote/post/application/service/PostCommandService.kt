@@ -1,9 +1,9 @@
 package house.spring.vote.post.application.service
 
-import house.spring.vote.common.domain.exception.ErrorCode
+import house.spring.vote.common.application.EventPublisher
+import house.spring.vote.common.domain.exception.conflict.AlreadyPickedPostException
 import house.spring.vote.common.domain.exception.internal_server.CopyImageFailException
-import house.spring.vote.common.domain.exception.internal_server.InternalServerException
-import house.spring.vote.common.domain.exception.not_found.NotFoundException
+import house.spring.vote.common.domain.exception.not_found.PostNotFoundException
 import house.spring.vote.post.application.port.ObjectKeyGenerator
 import house.spring.vote.post.application.port.ObjectManager
 import house.spring.vote.post.application.port.repository.PickedPollRepository
@@ -13,6 +13,7 @@ import house.spring.vote.post.application.service.dto.command.GenerateImageUploa
 import house.spring.vote.post.application.service.dto.command.PickPostCommand
 import house.spring.vote.post.controller.response.CreatePickResponseDto
 import house.spring.vote.post.controller.response.GenerateImageUploadUrlResponseDto
+import house.spring.vote.post.domain.event.PickedPollEvent
 import house.spring.vote.post.domain.model.Poll
 import house.spring.vote.post.domain.model.Post
 import kotlinx.coroutines.Dispatchers
@@ -21,11 +22,12 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class PostWriteService(
+class PostCommandService(
     private val objectManager: ObjectManager,
     private val objectKeyGenerator: ObjectKeyGenerator,
     private val postRepository: PostRepository,
     private val pickedPollRepository: PickedPollRepository,
+    private val eventPublisher: EventPublisher,
 ) {
     suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): GenerateImageUploadUrlResponseDto {
         val imageKey = objectKeyGenerator.generateTempImageKey(command.userId)
@@ -68,15 +70,21 @@ class PostWriteService(
     @Transactional
     fun pickPost(command: PickPostCommand): CreatePickResponseDto {
         val post = postRepository.findById(command.postId)
-            ?: throw NotFoundException("${ErrorCode.POST_NOT_FOUND} (${command.postId})")
+            ?: throw PostNotFoundException("(postId: ${command.postId})")
 
         val alreadyPicked = pickedPollRepository.existsByPostIdAndUserId(post.id, command.userId)
         if (alreadyPicked) {
-            throw InternalServerException("${ErrorCode.ALREADY_PICKED_POST} (${command.postId})")
+            throw AlreadyPickedPostException("(postId: ${command.postId})")
         }
 
         val pickedPolls = post.createPickedPolls(command.pickedPollIds)
         pickedPollRepository.saveAll(pickedPolls)
+
+        eventPublisher.publishEvent(
+            PickedPollEvent(postId = post.id,
+                pickedPolls.map { it.pollId }
+            )
+        )
 
         return CreatePickResponseDto(
             command.postId, command.pickedPollIds

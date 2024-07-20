@@ -12,7 +12,7 @@ data class Post(
     val userId: String,
     val pickType: PickType,
     val imageKey: String? = null,
-    val polls: List<Poll> = mutableListOf(),
+    val polls: List<Poll>,
 ) {
 
     init {
@@ -27,7 +27,6 @@ data class Post(
 
     fun createPickedPolls(pickedPollIds: List<String>): List<PickedPoll> {
         validatePickedPoll(pickedPollIds)
-        events.add(PickedPollEvent(this, id, pickedPollIds))
         return pickedPollIds.map { PickedPoll.create(id, it, userId) }
     }
 
@@ -48,7 +47,7 @@ data class Post(
         }
 
         if (hasInvalidPollId(pickedPollIds)) {
-            throw PickedPollNotFoundException("(${pickedPollIds.joinToString()})")
+            throw PickedPollNotFoundException("(pollIds: ${pickedPollIds.joinToString()})")
         }
     }
 
@@ -75,7 +74,7 @@ data class Post(
             userId: String,
             pickType: PickType,
             imageKey: String? = null,
-            polls: List<Poll> = mutableListOf(),
+            polls: List<Poll>,
         ): Post {
             return Post(id, title, userId, pickType, imageKey, polls)
         }

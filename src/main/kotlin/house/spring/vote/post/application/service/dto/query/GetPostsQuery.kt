@@ -5,7 +5,7 @@ import javax.swing.SortOrder
 
 data class GetPostsQuery(
     val userId: String,
-    val cursor: String?,
+    val offset: Int,
     val sortBy: SortBy,
     val sortOrder: SortOrder,
 )

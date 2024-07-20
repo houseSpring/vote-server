@@ -38,7 +38,7 @@ class JwtFilter(
 
     private fun shouldFilter(requestURI: String, method: String): Boolean {
         return when {
-            requestURI.startsWith("/posts/") -> true
+            requestURI.startsWith("/posts") -> true
             requestURI == "/upload-url" -> true
             requestURI == "/users" && method == "GET" -> true
             else -> false

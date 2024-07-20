@@ -2,7 +2,6 @@ package house.spring.vote.post.infrastructure.entity
 
 import house.spring.vote.post.domain.model.PickType
 import jakarta.persistence.*
-import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.domain.AbstractAggregateRoot
@@ -16,7 +15,6 @@ import java.time.LocalDateTime
         Index(name = "idx_post_cursor", columnList = "createdAt")
     ]
 )
-@DynamicUpdate
 class PostEntity(
     @Id
     val id: String,
@@ -56,12 +54,12 @@ class PostEntity(
         super.clearDomainEvents()
     }
 
-    fun addPoll(poll: PollEntity) {
-        polls.add(poll)
-        poll.post = this
+    fun addPolls(input: List<PollEntity>) {
+        polls.addAll(input)
+        input.forEach { it.post = this }
     }
 
     fun addEvents(events: List<Any>) {
-        registerEvent(events)
+        events.forEach { registerEvent(it) }
     }
 }

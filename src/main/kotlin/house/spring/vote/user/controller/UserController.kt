@@ -42,7 +42,6 @@ class UserController(
     fun getUserInfo(
         @CurrentUser user: LoginUser,
     ): ResponseEntity<GetUserInfoResponseDto> {
-        println("user: $user")
         val response = userQueryService.getUserInfoById(user.id)
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }

@@ -6,7 +6,8 @@ import javax.swing.SortOrder
 
 data class GetPostsResponseDto(
     val posts: List<GetPostsResponseDtoPost>,
-    val cursor: String?,
+    val currentPage: Int,
+    val totalPages: Int,
     val sortBy: SortBy,
     val sortOrder: SortOrder,
 ) {
@@ -14,6 +15,7 @@ data class GetPostsResponseDto(
         val id: String,
         val title: String,
         val imageUrl: String?,
+        val userId: String,
         val participantCount: Int,
         val createdAt: LocalDateTime,
         val updatedAt: LocalDateTime,

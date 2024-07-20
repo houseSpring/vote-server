@@ -5,6 +5,7 @@ import house.spring.vote.post.application.port.repository.PostRepository
 import house.spring.vote.post.application.port.repository.dto.PostQuery
 import house.spring.vote.post.domain.model.Post
 import house.spring.vote.post.infrastructure.entity.PostEntity
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Repository
@@ -22,37 +23,24 @@ class PostRepositoryImpl(
 
     override fun findById(id: String): Post? {
         val post = postJpaRepository.findById(id).orElse(null) ?: return null
-        return post.let { postMapper.toDomain(it) }
+        return postMapper.toDomain(post)
     }
 
-    override fun findAllByQuery(query: PostQuery): List<PostEntity> {
-        val sort = idSortOrderToSort(query.sortOrder)
-        val pageable = PageRequest.of(0, query.pageSize, sort)
-        val cursor = generateCursor(query.cursor, query.id, query.sortOrder)
-        return if (query.sortOrder == SortOrder.DESCENDING) {
-            postJpaRepository.findAllByIdSmallerThanCursor(cursor, query.userId, pageable)
-        } else {
-            postJpaRepository.findAllByIdBiggerThanCursor(cursor, query.userId, pageable)
+    override fun findAllByQuery(query: PostQuery): Page<PostEntity> {
+        val pageable = PageRequest.of(query.offset, query.pageSize, createdAtSortOrderToSort(query.sortOrder))
+        // TODO: 기획과 다른 임시코드임. 수정 필요
+        return postJpaRepository.findAll(pageable)
+    }
+
+    private fun createdAtSortOrderToSort(sortOrder: SortOrder): Sort {
+        return when (sortOrder) {
+            SortOrder.ASCENDING -> Sort.by(Sort.Order.asc("createdAt"))
+            SortOrder.DESCENDING -> Sort.by(Sort.Order.desc("createdAt"))
+            else -> Sort.unsorted()
         }
     }
 
     override fun findEntityById(id: String): PostEntity? {
         return postJpaRepository.findById(id).orElse(null)
-    }
-
-    // TODO: 이후 픽스
-    private fun generateCursor(cursor: String? = null, postId: String? = null, sortOrder: SortOrder): Long {
-        println("cursor: $cursor")
-        println("postId: $postId")
-        println("sortOrder: $sortOrder")
-        return 0L
-    }
-
-    private fun idSortOrderToSort(sortOrder: SortOrder): Sort {
-        return when (sortOrder) {
-            SortOrder.ASCENDING -> Sort.by(Sort.Order.asc("id"))
-            SortOrder.DESCENDING -> Sort.by(Sort.Order.desc("id"))
-            else -> Sort.unsorted()
-        }
     }
 }
