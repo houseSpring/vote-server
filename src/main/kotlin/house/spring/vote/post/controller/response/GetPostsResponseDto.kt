@@ -9,13 +9,13 @@ data class GetPostsResponseDto(
     val cursor: String?,
     val sortBy: SortBy,
     val sortOrder: SortOrder,
-)
-
-data class GetPostsResponseDtoPost(
-    val id: String,
-    val title: String,
-    val imageUrl: String?,
-    val participantCount: Int,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
-)
+) {
+    data class GetPostsResponseDtoPost(
+        val id: String,
+        val title: String,
+        val imageUrl: String?,
+        val participantCount: Int,
+        val createdAt: LocalDateTime,
+        val updatedAt: LocalDateTime,
+    )
+}

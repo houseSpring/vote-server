@@ -10,7 +10,6 @@ import house.spring.vote.post.application.service.dto.query.GetPostsQuery
 import house.spring.vote.post.application.service.dto.query.GetPrevPostIdQuery
 import house.spring.vote.post.controller.response.GetPostResponseDto
 import house.spring.vote.post.controller.response.GetPostsResponseDto
-import house.spring.vote.post.controller.response.GetPostsResponseDtoPost
 import house.spring.vote.post.controller.response.GetPrevPostResponseDto
 import house.spring.vote.post.infrastructure.entity.PollEntity
 import house.spring.vote.post.infrastructure.entity.PostEntity
@@ -92,8 +91,8 @@ class PostReadService(
         )
     }
 
-    private fun PostEntity.toDto(participantCount: Int, imageUrl: String?): GetPostsResponseDtoPost {
-        return GetPostsResponseDtoPost(
+    private fun PostEntity.toDto(participantCount: Int, imageUrl: String?): GetPostsResponseDto.GetPostsResponseDtoPost {
+        return GetPostsResponseDto.GetPostsResponseDtoPost(
             id = this.id,
             title = this.title,
             imageUrl = imageUrl,

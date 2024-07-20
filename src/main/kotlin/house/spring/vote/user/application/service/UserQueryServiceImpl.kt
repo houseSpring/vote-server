@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 class UserQueryServiceImpl(private val userRepository: UserRepository) : UserQueryService {
     override fun getUserInfoById(userId: String): GetUserInfoResponseDto {
         val user = userRepository.findById(userId)
-            ?: throw NotFoundException("${ErrorCode.USER_NOT_FOUND} (${userId})")
+            ?: throw NotFoundException("${ErrorCode.USER_NOT_FOUND} (userId: ${userId})")
         return GetUserInfoResponseDto(user.id, user.nickname)
     }
 }
