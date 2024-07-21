@@ -26,12 +26,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-logging")
     implementation("io.jsonwebtoken:jjwt:0.12.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     // aws s3
-    implementation("aws.sdk.kotlin:s3:1.2.12"){
+    implementation("aws.sdk.kotlin:s3:1.2.12") {
         exclude("com.squareup.okhttp3", "okhttp")
     }
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
