@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class PostCommandServiceImp(
+class PostCommandServiceImpl(
     private val objectManager: ObjectManager,
     private val objectKeyGenerator: ObjectKeyGenerator,
     private val postRepository: PostRepository,
