@@ -4,15 +4,12 @@ import house.spring.vote.common.application.EventPublisher
 import house.spring.vote.common.domain.exception.conflict.AlreadyPickedPostException
 import house.spring.vote.common.domain.exception.internal_server.CopyImageFailException
 import house.spring.vote.common.domain.exception.not_found.PostNotFoundException
-import house.spring.vote.post.application.port.ObjectKeyGenerator
-import house.spring.vote.post.application.port.ObjectManager
-import house.spring.vote.post.application.port.repository.PickedPollRepository
-import house.spring.vote.post.application.port.repository.PostRepository
-import house.spring.vote.post.application.service.dto.command.CreatePostCommand
-import house.spring.vote.post.application.service.dto.command.GenerateImageUploadUrlCommand
-import house.spring.vote.post.application.service.dto.command.PickPostCommand
-import house.spring.vote.post.controller.response.CreatePickResponseDto
-import house.spring.vote.post.controller.response.GenerateImageUploadUrlResponseDto
+import house.spring.vote.post.application.port.`in`.PostCommandService
+import house.spring.vote.post.application.port.out.ObjectKeyGenerator
+import house.spring.vote.post.application.port.out.ObjectManager
+import house.spring.vote.post.application.port.out.repository.PickedPollRepository
+import house.spring.vote.post.application.port.out.repository.PostRepository
+import house.spring.vote.post.application.service.dto.command.*
 import house.spring.vote.post.domain.event.PickedPollEvent
 import house.spring.vote.post.domain.model.Poll
 import house.spring.vote.post.domain.model.Post
@@ -22,20 +19,20 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class PostCommandService(
+class PostCommandServiceImp(
     private val objectManager: ObjectManager,
     private val objectKeyGenerator: ObjectKeyGenerator,
     private val postRepository: PostRepository,
     private val pickedPollRepository: PickedPollRepository,
     private val eventPublisher: EventPublisher,
-) {
-    suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): GenerateImageUploadUrlResponseDto {
+) : PostCommandService {
+    override suspend fun createImageUploadUrl(command: GenerateImageUploadUrlCommand): CreatePostCommandResult {
         val imageKey = objectKeyGenerator.generateTempImageKey(command.userId)
         val uploadUrl = objectManager.generateUploadUrl(imageKey)
-        return GenerateImageUploadUrlResponseDto(uploadUrl, imageKey)
+        return CreatePostCommandResult(uploadUrl, imageKey)
     }
 
-    suspend fun create(command: CreatePostCommand): String {
+    override suspend fun create(command: CreatePostCommand): String {
         val post = Post.create(
             title = command.title,
             userId = command.userId,
@@ -68,7 +65,7 @@ class PostCommandService(
     }
 
     @Transactional
-    fun pickPost(command: PickPostCommand): CreatePickResponseDto {
+    override fun pickPost(command: PickPostCommand): PickedPostCommandResult {
         val post = postRepository.findById(command.postId)
             ?: throw PostNotFoundException("(postId: ${command.postId})")
 
@@ -86,7 +83,7 @@ class PostCommandService(
             )
         )
 
-        return CreatePickResponseDto(
+        return PickedPostCommandResult(
             command.postId, command.pickedPollIds
         )
     }

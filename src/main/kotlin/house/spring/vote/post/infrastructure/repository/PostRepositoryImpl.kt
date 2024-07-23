@@ -1,8 +1,8 @@
 package house.spring.vote.post.infrastructure.repository
 
-import house.spring.vote.post.application.port.mapper.PostMapper
-import house.spring.vote.post.application.port.repository.PostRepository
-import house.spring.vote.post.application.port.repository.dto.PostQuery
+import house.spring.vote.post.application.port.out.mapper.PostMapper
+import house.spring.vote.post.application.port.out.repository.PostRepository
+import house.spring.vote.post.application.port.out.repository.dto.PostQuery
 import house.spring.vote.post.domain.model.Post
 import house.spring.vote.post.infrastructure.entity.PostEntity
 import org.springframework.data.domain.Page

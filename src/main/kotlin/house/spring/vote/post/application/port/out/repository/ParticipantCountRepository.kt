@@ -1,4 +1,4 @@
-package house.spring.vote.post.application.port.repository
+package house.spring.vote.post.application.port.out.repository
 
 interface ParticipantCountRepository {
     fun getPostsCount(postIds: List<String>): Map<String, Int>

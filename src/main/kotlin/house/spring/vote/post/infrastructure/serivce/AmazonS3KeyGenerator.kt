@@ -1,7 +1,7 @@
 package house.spring.vote.post.infrastructure.serivce
 
 import house.spring.vote.common.infrastructure.HashUtil
-import house.spring.vote.post.application.port.ObjectKeyGenerator
+import house.spring.vote.post.application.port.out.ObjectKeyGenerator
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 

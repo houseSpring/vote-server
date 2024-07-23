@@ -6,10 +6,10 @@ data class CreatePostCommand(
     val title: String,
     val userId: String,
     val pickType: PickType,
-    val polls: List<CreatePostCommandPoll>,
+    val polls: List<Poll>,
     val imageKey: String?,
-)
-
-data class CreatePostCommandPoll(
-    val title: String,
-)
+) {
+    data class Poll(
+        val title: String
+    )
+}

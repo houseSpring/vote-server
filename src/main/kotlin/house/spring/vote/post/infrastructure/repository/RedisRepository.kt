@@ -1,7 +1,7 @@
 package house.spring.vote.post.infrastructure.repository
 
-import house.spring.vote.post.application.port.CountKeyGenerator
-import house.spring.vote.post.application.port.repository.ParticipantCountRepository
+import house.spring.vote.post.application.port.out.CountKeyGenerator
+import house.spring.vote.post.application.port.out.repository.ParticipantCountRepository
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 

@@ -1,4 +1,4 @@
-package house.spring.vote.post.application.port.repository
+package house.spring.vote.post.application.port.out.repository
 
 import house.spring.vote.post.domain.model.PickedPoll
 

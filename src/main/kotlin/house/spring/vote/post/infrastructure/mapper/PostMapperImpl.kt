@@ -1,7 +1,7 @@
 package house.spring.vote.post.infrastructure.mapper
 
-import house.spring.vote.post.application.port.mapper.PollMapper
-import house.spring.vote.post.application.port.mapper.PostMapper
+import house.spring.vote.post.application.port.out.mapper.PollMapper
+import house.spring.vote.post.application.port.out.mapper.PostMapper
 import house.spring.vote.post.domain.model.Post
 import house.spring.vote.post.infrastructure.entity.PostEntity
 import org.springframework.stereotype.Component

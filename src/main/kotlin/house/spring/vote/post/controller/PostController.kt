@@ -2,8 +2,8 @@ package house.spring.vote.post.controller
 
 import house.spring.vote.common.controller.annotation.CurrentUser
 import house.spring.vote.common.controller.annotation.SecureEndPoint
-import house.spring.vote.post.application.service.PostQueryService
-import house.spring.vote.post.application.service.PostCommandService
+import house.spring.vote.post.application.port.`in`.PostCommandService
+import house.spring.vote.post.application.port.`in`.PostQueryService
 import house.spring.vote.post.application.service.dto.command.GenerateImageUploadUrlCommand
 import house.spring.vote.post.application.service.dto.command.PickPostCommand
 import house.spring.vote.post.application.service.dto.query.GetPostsQuery
@@ -29,7 +29,8 @@ class PostController(
     ): ResponseEntity<GenerateImageUploadUrlResponseDto> {
         val command = GenerateImageUploadUrlCommand(user.id)
         val result = this.postCommandService.createImageUploadUrl(command)
-        return ResponseEntity.status(HttpStatus.CREATED).body(result)
+        val responseDto = GenerateImageUploadUrlResponseDto(result.uploadUrl, result.imageKey)
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto)
     }
 
     @SecureEndPoint
@@ -52,7 +53,8 @@ class PostController(
     ): ResponseEntity<CreatePickResponseDto> {
         val command = PickPostCommand(postId, user.id, dto.pickedPollIds)
         val result = this.postCommandService.pickPost(command)
-        return ResponseEntity.status(HttpStatus.CREATED).body(result)
+        val responseDto = CreatePickResponseDto.from(result)
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto)
     }
 
 

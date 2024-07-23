@@ -1,6 +1,6 @@
 package house.spring.vote.post.infrastructure.serivce
 
-import house.spring.vote.post.application.port.CountKeyGenerator
+import house.spring.vote.post.application.port.out.CountKeyGenerator
 import org.springframework.stereotype.Component
 
 @Component

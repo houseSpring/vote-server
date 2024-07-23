@@ -1,4 +1,4 @@
-package house.spring.vote.post.application.port.repository.dto
+package house.spring.vote.post.application.port.out.repository.dto
 
 import house.spring.vote.post.domain.model.SortBy
 import javax.swing.SortOrder

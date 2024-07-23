@@ -1,4 +1,4 @@
-package house.spring.vote.post.application.port
+package house.spring.vote.post.application.port.out
 
 interface ObjectManager {
     fun generateDownloadUrl(objectKey: String): String

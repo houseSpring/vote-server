@@ -1,4 +1,4 @@
-package house.spring.vote.post.application.port.mapper
+package house.spring.vote.post.application.port.out.mapper
 
 import house.spring.vote.post.domain.model.Post
 import house.spring.vote.post.infrastructure.entity.PostEntity
