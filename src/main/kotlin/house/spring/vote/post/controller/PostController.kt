@@ -7,9 +7,14 @@ import house.spring.vote.post.application.port.`in`.PostQueryService
 import house.spring.vote.post.application.service.dto.command.GenerateImageUploadUrlCommand
 import house.spring.vote.post.application.service.dto.command.PickPostCommand
 import house.spring.vote.post.application.service.dto.query.GetPostsQuery
-import house.spring.vote.post.application.service.dto.query.GetPrevPostIdQuery
-import house.spring.vote.post.controller.request.*
-import house.spring.vote.post.controller.response.*
+import house.spring.vote.post.controller.request.CreatePostRequestDto
+import house.spring.vote.post.controller.request.CreatePostResponseDto
+import house.spring.vote.post.controller.request.GetPostsRequestDto
+import house.spring.vote.post.controller.request.PickPostRequestDto
+import house.spring.vote.post.controller.response.CreatePickResponseDto
+import house.spring.vote.post.controller.response.GenerateImageUploadUrlResponseDto
+import house.spring.vote.post.controller.response.GetPostResponseDto
+import house.spring.vote.post.controller.response.GetPostsResponseDto
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -78,20 +83,6 @@ class PostController(
     @GetMapping("/posts/{id}")
     fun getPost(@PathVariable id: String): ResponseEntity<GetPostResponseDto> {
         val result = postQueryService.getPost(id)
-        return ResponseEntity.ok(result)
-    }
-
-    @SecureEndPoint
-    @GetMapping("/posts/{id}/prev")
-    fun getNextPostInfo(
-        @PathVariable("id") postId: String,
-        @ModelAttribute dto: GetPrevPostRequestDto,
-        @CurrentUser user: LoginUser,
-    ): ResponseEntity<GetPrevPostResponseDto> {
-        val query = GetPrevPostIdQuery(
-            userId = user.id, postId = postId, sortBy = dto.sortBy, sortOrder = dto.sortOrder
-        )
-        val result = postQueryService.getPrevPostIds(query)
         return ResponseEntity.ok(result)
     }
 }

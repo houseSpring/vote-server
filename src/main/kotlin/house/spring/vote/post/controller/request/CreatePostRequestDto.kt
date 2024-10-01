@@ -1,7 +1,7 @@
 package house.spring.vote.post.controller.request
 
 import house.spring.vote.post.application.service.dto.command.CreatePostCommand
-import house.spring.vote.post.application.service.dto.command.CreatePostCommandPoll
+
 import house.spring.vote.post.domain.model.PickType
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
@@ -30,7 +30,7 @@ data class CreatePostRequestDto(
             title = title,
             userId = userId,
             pickType = pickType,
-            polls = polls.map { CreatePostCommandPoll(it.title) },
+            polls = polls.map { CreatePostCommand.Poll(it.title) },
             imageKey = imageKey
         )
     }

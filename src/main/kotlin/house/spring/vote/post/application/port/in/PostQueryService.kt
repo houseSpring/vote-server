@@ -9,5 +9,4 @@ import house.spring.vote.post.controller.response.GetPrevPostResponseDto
 interface PostQueryService {
     fun getPost(postId:String):GetPostResponseDto
     fun getPosts(query: GetPostsQuery):GetPostsResponseDto
-    fun getPrevPostIds(query:GetPrevPostIdQuery):GetPrevPostResponseDto
 }

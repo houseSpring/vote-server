@@ -19,5 +19,6 @@ data class GetPostsResponseDto(
         val participantCount: Int,
         val createdAt: LocalDateTime,
         val updatedAt: LocalDateTime,
+        val isVoted: Boolean,
     )
 }

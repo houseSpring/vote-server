@@ -28,9 +28,9 @@ class PostRepositoryImpl(
 
     override fun findAllByQuery(query: PostQuery): Page<PostEntity> {
         val pageable = PageRequest.of(query.offset, query.pageSize, createdAtSortOrderToSort(query.sortOrder))
-        // TODO: 기획과 다른 임시코드임. 수정 필요
         return postJpaRepository.findAll(pageable)
     }
+
 
     private fun createdAtSortOrderToSort(sortOrder: SortOrder): Sort {
         return when (sortOrder) {

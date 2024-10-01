@@ -4,6 +4,7 @@ import house.spring.vote.common.domain.exception.not_found.PostNotFoundException
 import house.spring.vote.post.application.port.`in`.PostQueryService
 import house.spring.vote.post.application.port.out.ObjectManager
 import house.spring.vote.post.application.port.out.repository.ParticipantCountRepository
+import house.spring.vote.post.application.port.out.repository.PickedPollRepository
 import house.spring.vote.post.application.port.out.repository.PostRepository
 import house.spring.vote.post.application.port.out.repository.dto.PostQuery
 import house.spring.vote.post.application.service.dto.query.GetPostsQuery
@@ -20,6 +21,7 @@ class PostQueryServiceImpl(
     private val postRepository: PostRepository,
     private val objectManager: ObjectManager,
     private val participantCountRepository: ParticipantCountRepository,
+    private val prickedPollRepository: PickedPollRepository,
 ) : PostQueryService {
     override fun getPost(postId: String): GetPostResponseDto {
         val post = postRepository.findEntityById(postId)
@@ -37,7 +39,6 @@ class PostQueryServiceImpl(
         )
     }
 
-
     override fun getPosts(query: GetPostsQuery): GetPostsResponseDto {
         val page = postRepository.findAllByQuery(
             PostQuery(
@@ -48,34 +49,25 @@ class PostQueryServiceImpl(
                 pageSize = PAGE_SIZE,
             )
         )
+
         val postIdToCount = participantCountRepository.getPostsCount(page.content.map { it.id })
+        val pickedPollSet = prickedPollRepository.findAllByUserIdAndPostIds(
+            userId = query.userId,
+            postIds = page.content.map { it.id }
+        ).map { it.postId }.toHashSet()
+
         return GetPostsResponseDto(
             posts = page.content.map {
                 it.toDto(
-                    postIdToCount[it.id]!!,
-                    it.imageKey?.let { imageKey -> objectManager.generateDownloadUrl(imageKey) }
+                    participantCount = postIdToCount[it.id]!!,
+                    imageUrl = it.imageKey?.let { imageKey -> objectManager.generateDownloadUrl(imageKey) },
+                    isVoted = pickedPollSet.contains(it.id)
                 )
             },
             currentPage = page.number,
             totalPages = page.totalPages,
             sortBy = query.sortBy,
             sortOrder = query.sortOrder
-        )
-    }
-
-    override fun getPrevPostIds(query: GetPrevPostIdQuery): GetPrevPostResponseDto {
-        // TODO: 페이지네이션으로 변경으로 의도대로 동작하지 않음
-        val page = postRepository.findAllByQuery(
-            PostQuery(
-                userId = query.userId,
-                sortBy = query.sortBy,
-                sortOrder = query.sortOrder,
-                pageSize = PAGE_SIZE,
-            )
-        )
-
-        return GetPrevPostResponseDto(
-            unReadPostIds = page.content.map { it.id }
         )
     }
 
@@ -90,6 +82,7 @@ class PostQueryServiceImpl(
     private fun PostEntity.toDto(
         participantCount: Int,
         imageUrl: String?,
+        isVoted: Boolean,
     ): GetPostsResponseDto.GetPostsResponseDtoPost {
         return GetPostsResponseDto.GetPostsResponseDtoPost(
             id = this.id,
@@ -98,7 +91,8 @@ class PostQueryServiceImpl(
             imageUrl = imageUrl,
             participantCount = participantCount,
             createdAt = this.createdAt,
-            updatedAt = this.updatedAt
+            updatedAt = this.updatedAt,
+            isVoted = isVoted
         )
     }
 
