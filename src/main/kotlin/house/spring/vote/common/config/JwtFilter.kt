@@ -41,6 +41,7 @@ class JwtFilter(
             requestURI.startsWith("/posts") -> true
             requestURI == "/upload-url" -> true
             requestURI == "/users" && method == "GET" -> true
+            requestURI.startsWith("/reports") -> true
             else -> false
         }
     }

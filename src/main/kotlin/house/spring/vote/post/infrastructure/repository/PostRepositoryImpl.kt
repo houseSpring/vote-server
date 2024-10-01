@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Repository
 import javax.swing.SortOrder
+import kotlin.jvm.optionals.getOrNull
 
 @Repository
 class PostRepositoryImpl(
@@ -22,7 +23,7 @@ class PostRepositoryImpl(
     }
 
     override fun findById(id: String): Post? {
-        val post = postJpaRepository.findById(id).orElse(null) ?: return null
+        val post = postJpaRepository.findById(id).getOrNull() ?: return null
         return postMapper.toDomain(post)
     }
 

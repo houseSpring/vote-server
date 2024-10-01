@@ -3,7 +3,6 @@ package house.spring.vote.post.domain.model
 import house.spring.vote.common.domain.exception.ErrorCode
 import house.spring.vote.common.domain.exception.bad_request.InvalidPickedPollSizeException
 import house.spring.vote.common.domain.exception.not_found.PickedPollNotFoundException
-import house.spring.vote.post.domain.event.PickedPollEvent
 import java.util.*
 
 data class Post(

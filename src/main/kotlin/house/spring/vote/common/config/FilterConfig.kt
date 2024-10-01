@@ -16,6 +16,7 @@ class FilterConfig {
         registrationBean.addUrlPatterns("/posts/*")
         registrationBean.addUrlPatterns("/upload-url")
         registrationBean.addUrlPatterns("/users") // GET만
+        registrationBean.addUrlPatterns("/reports/*")
 
         return registrationBean
     }
